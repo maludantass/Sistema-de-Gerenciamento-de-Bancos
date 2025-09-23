@@ -126,6 +126,7 @@ CREATE TABLE Saque (
     idTransacao INT PRIMARY KEY,
     tipo_saque VARCHAR(50),
     limite_utilizado DECIMAL(12,2) DEFAULT 0 CHECK (limite_utilizado >= 0),
+    valor DECIMAL(12,2) CHECK (valor > 0), 
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
 
@@ -133,8 +134,10 @@ CREATE TABLE Deposito (
     idTransacao INT PRIMARY KEY,
     origem_valor VARCHAR(100),
     metodo_deposito VARCHAR(50),
+    valor DECIMAL(12,2) CHECK (valor > 0), 
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
+
 
 CREATE TABLE Recibo (
     idRecibo INT PRIMARY KEY,
