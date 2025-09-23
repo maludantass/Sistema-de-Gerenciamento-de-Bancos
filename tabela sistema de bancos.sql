@@ -1,4 +1,5 @@
 CREATE DATABASE SISTEMA_BANCOS;
+USE SISTEMA_BANCOS;
 
 CREATE TABLE Banco (
     idBanco INT PRIMARY KEY,
@@ -16,7 +17,7 @@ CREATE TABLE Cliente (
 
 CREATE TABLE Solicitacao (
     idSolicitacao INT PRIMARY KEY
-);
+); 
 
 CREATE TABLE Funcionario (
     idFuncionario INT PRIMARY KEY,
