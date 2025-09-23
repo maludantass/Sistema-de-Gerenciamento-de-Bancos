@@ -1,4 +1,5 @@
 CREATE DATABASE SISTEMA_BANCOS;
+USE SISTEMA_BANCOS;
 
 CREATE TABLE Banco (
     idBanco INT PRIMARY KEY,
@@ -64,10 +65,12 @@ CREATE TABLE Possui (
 CREATE TABLE Conta (
     idConta INT PRIMARY KEY,
     idCliente INT NOT NULL,
+    idBanco INT NOT NULL,
     agencia VARCHAR(20) NOT NULL,
     numero VARCHAR(20) UNIQUE NOT NULL,
     saldo DECIMAL(12,2) DEFAULT 0 CHECK (saldo >= 0), 
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
+    FOREIGN KEY (idBanco) REFERENCES Banco(idBanco)
 );
 
 CREATE TABLE ContaCorrente (
@@ -126,7 +129,7 @@ CREATE TABLE Saque (
     idTransacao INT PRIMARY KEY,
     tipo_saque VARCHAR(50),
     limite_utilizado DECIMAL(12,2) DEFAULT 0 CHECK (limite_utilizado >= 0),
-    valor DECIMAL(12,2) CHECK (valor > 0), 
+    valor_saque DECIMAL(12,2) CHECK (valor_saque > 0), 
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
 
@@ -134,7 +137,7 @@ CREATE TABLE Deposito (
     idTransacao INT PRIMARY KEY,
     origem_valor VARCHAR(100),
     metodo_deposito VARCHAR(50),
-    valor DECIMAL(12,2) CHECK (valor > 0), 
+    valor_deposito DECIMAL(12,2) CHECK (valor_deposito > 0), 
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
 
@@ -144,7 +147,7 @@ CREATE TABLE Recibo (
     idTransacao INT NOT NULL,
     data_emissao DATE DEFAULT (CURRENT_DATE),
     tipo_transacao VARCHAR(50),
-    valor DECIMAL(12,2) CHECK (valor > 0),
+    valor_recibo DECIMAL(12,2) CHECK (valor_recibo > 0),
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
 
