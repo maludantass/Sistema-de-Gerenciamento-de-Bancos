@@ -1,5 +1,4 @@
 CREATE DATABASE SISTEMA_BANCOS;
-USE SISTEMA_BANCOS;
 
 CREATE TABLE Banco (
     idBanco INT PRIMARY KEY,
@@ -17,7 +16,7 @@ CREATE TABLE Cliente (
 
 CREATE TABLE Solicitacao (
     idSolicitacao INT PRIMARY KEY
-); 
+);
 
 CREATE TABLE Funcionario (
     idFuncionario INT PRIMARY KEY,
@@ -145,3 +144,21 @@ CREATE TABLE Recibo (
     valor DECIMAL(12,2) CHECK (valor > 0),
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
+
+ALTER TABLE Funcionario
+MODIFY idSupervisor INT NULL;
+
+ALTER TABLE Funcionario
+ADD CONSTRAINT fk_funcionario_supervisor
+FOREIGN KEY (idSupervisor) REFERENCES Funcionario(idFuncionario)
+ON DELETE SET NULL;
+
+ALTER TABLE Possui
+ADD CONSTRAINT fk_possui_cliente
+FOREIGN KEY (codCliente) REFERENCES Cliente(idCliente)
+ON UPDATE CASCADE;
+
+ALTER TABLE Possui
+ADD CONSTRAINT fk_possui_banco
+FOREIGN KEY (codBanco) REFERENCES Banco(idBanco)
+ON UPDATE CASCADE;
