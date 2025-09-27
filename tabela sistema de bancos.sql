@@ -1,170 +1,175 @@
 CREATE DATABASE SISTEMA_BANCOS;
 USE SISTEMA_BANCOS;
 
-CREATE TABLE Banco (
-    idBanco INT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    CNPJ VARCHAR(20) UNIQUE NOT NULL
-);
-
-CREATE TABLE Cliente (
-    idCliente INT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    rua VARCHAR(100),
-    numero VARCHAR(10),
-    CEP VARCHAR(15) CHECK (LENGTH(CEP) BETWEEN 8 AND 15) 
-);
 
 CREATE TABLE Solicitacao (
-    idSolicitacao INT PRIMARY KEY
+    id_solicitacao INT PRIMARY KEY AUTO_INCREMENT
 );
 
 CREATE TABLE Funcionario (
-    idFuncionario INT PRIMARY KEY,
-    idBanco INT NOT NULL,
+    idFuncionario INT PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(255) NOT NULL,
-    funcao VARCHAR(50) DEFAULT 'Atendente', 
-    solicitacao INT,
+    funcao VARCHAR(100),
+    id_solicitacao INT,
     idSupervisor INT,
-    FOREIGN KEY (idBanco) REFERENCES Banco(idBanco),
-    FOREIGN KEY (solicitacao) REFERENCES Solicitacao(idSolicitacao),
+    FOREIGN KEY (id_solicitacao) REFERENCES Solicitacao(id_solicitacao) ON DELETE SET NULL,
     FOREIGN KEY (idSupervisor) REFERENCES Funcionario(idFuncionario)
 );
 
-CREATE TABLE Telefone (
-    Numero VARCHAR(20),
-    idCliente INT,
-    PRIMARY KEY (Numero, idCliente),
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
-    CHECK (Numero <> '') 
+CREATE TABLE Cliente (
+    id_Cliente INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(255) NOT NULL,
+    rua VARCHAR(255),
+    numero VARCHAR(20),
+    CEP VARCHAR(9)
 );
+
+
+CREATE TABLE Pesquisa (
+    idPesquisa INT PRIMARY KEY AUTO_INCREMENT,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    id_respondente INT,
+    FOREIGN KEY (id_respondente) REFERENCES Cliente(id_Cliente) ON DELETE SET NULL
+);
+
+
+CREATE TABLE Pergunta (
+    idPergunta INT PRIMARY KEY AUTO_INCREMENT,
+    texto TEXT NOT NULL,
+    resposta TEXT
+);
+
+
+CREATE TABLE Contem (
+    idPesquisa INT,
+    idPergunta INT,
+    PRIMARY KEY (idPesquisa, idPergunta),
+    FOREIGN KEY (idPesquisa) REFERENCES Pesquisa(idPesquisa),
+    FOREIGN KEY (idPergunta) REFERENCES Pergunta(idPergunta)
+);
+
+
+CREATE TABLE Telefone (
+    Numero VARCHAR(20) PRIMARY KEY,
+    id_Cliente INT,
+    FOREIGN KEY (id_Cliente) REFERENCES Cliente(id_Cliente)
+);
+
 
 CREATE TABLE PessoaFisica (
-    idCliente INT PRIMARY KEY,
-    sexo CHAR(1) CHECK (sexo IN ('M','F')), 
+    id_Cliente INT PRIMARY KEY,
+    sexo CHAR(1),
     idade INT,
-    cpf VARCHAR(15) UNIQUE NOT NULL,
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    FOREIGN KEY (id_Cliente) REFERENCES Cliente(id_Cliente),
+    CHECK (sexo IN ('M', 'F', 'O'))
 );
+
 
 CREATE TABLE PessoaJuridica (
-    idCliente INT PRIMARY KEY,
-    cnpj VARCHAR(20) UNIQUE NOT NULL,
-    tipo VARCHAR(50) DEFAULT 'LTDA',
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    id_Cliente INT PRIMARY KEY,
+    cnpj VARCHAR(18) NOT NULL UNIQUE,
+    tipo VARCHAR(50),
+    FOREIGN KEY (id_Cliente) REFERENCES Cliente(id_Cliente)
 );
 
-CREATE TABLE Possui (
-    codCliente INT,
-    codBanco INT,
-    PRIMARY KEY (codCliente, codBanco),
-    FOREIGN KEY (codCliente) REFERENCES Cliente(idCliente),
-    FOREIGN KEY (codBanco) REFERENCES Banco(idBanco)
-);
 
 CREATE TABLE Conta (
-    idConta INT PRIMARY KEY,
-    idCliente INT NOT NULL,
-    idBanco INT NOT NULL,
-    agencia VARCHAR(20) NOT NULL,
-    numero VARCHAR(20) UNIQUE NOT NULL,
-    saldo DECIMAL(12,2) DEFAULT 0 CHECK (saldo >= 0), 
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente),
-    FOREIGN KEY (idBanco) REFERENCES Banco(idBanco)
+    idConta INT PRIMARY KEY AUTO_INCREMENT,
+    agencia VARCHAR(10) NOT NULL,
+    numero VARCHAR(20) NOT NULL,
+    saldo DECIMAL(15, 2) DEFAULT 0.00,
+    id_Cliente INT,
+    FOREIGN KEY (id_Cliente) REFERENCES Cliente(id_Cliente),
+    UNIQUE (agencia, numero),
+    CHECK (saldo >= 0)
 );
 
-CREATE TABLE ContaCorrente (
+
+CREATE TABLE Conta_corrente (
     idConta INT PRIMARY KEY,
-    tarifaMensal DECIMAL(10,2) DEFAULT 0 CHECK (tarifaMensal >= 0),
-    FOREIGN KEY (idConta) REFERENCES Conta(idConta)
+    tarifaMensal DECIMAL(10, 2),
+    FOREIGN KEY (idConta) REFERENCES Conta(idConta) ON UPDATE CASCADE
 );
 
-CREATE TABLE ContaPoupanca (
+
+CREATE TABLE Conta_poupanca (
     idConta INT PRIMARY KEY,
-    taxaRendimento DECIMAL(5,2) DEFAULT 0 CHECK (taxaRendimento >= 0),
-    FOREIGN KEY (idConta) REFERENCES Conta(idConta)
+    taxaRendimento DECIMAL(5, 4),
+    FOREIGN KEY (idConta) REFERENCES Conta(idConta),
+    CHECK (taxaRendimento > 0)
 );
+
 
 CREATE TABLE Servico (
-    idServico INT PRIMARY KEY,
-    idCliente INT NOT NULL,
-    descricao_servico VARCHAR(200),
-    taxa_juros DECIMAL(5,2) CHECK (taxa_juros >= 0),
-    prazo_meses INT CHECK (prazo_meses >= 0),
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    idServico INT PRIMARY KEY AUTO_INCREMENT,
+    descricao_servico TEXT,
+    taxa_juros DECIMAL(5, 4),
+    prazo_meses INT,
+    id_Cliente INT,
+    FOREIGN KEY (id_Cliente) REFERENCES Cliente(id_Cliente)
 );
+
 
 CREATE TABLE Emprestimo (
     idServico INT PRIMARY KEY,
-    valor_solicitado DECIMAL(12,2) CHECK (valor_solicitado > 0),
-    tipo_emprestimo VARCHAR(50) NOT NULL,
+    valor_solicitado DECIMAL(15, 2) NOT NULL,
+    tipo_emprestimo VARCHAR(50),
     FOREIGN KEY (idServico) REFERENCES Servico(idServico)
 );
+
 
 CREATE TABLE Financiamento (
     idServico INT PRIMARY KEY,
-    valor_entrada DECIMAL(12,2) DEFAULT 0 CHECK (valor_entrada >= 0),
-    valor_bem DECIMAL(12,2) CHECK (valor_bem > 0),
-    tipo_garantia VARCHAR(50),
+    valor_entrada DECIMAL(15, 2),
+    valor_bem DECIMAL(15, 2) NOT NULL,
+    tipo_garantia VARCHAR(100),
     FOREIGN KEY (idServico) REFERENCES Servico(idServico)
 );
+
 
 CREATE TABLE Contrato (
-    idContrato INT PRIMARY KEY,
-    idServico INT NOT NULL,
-    tipo_contrato VARCHAR(50),
-    valor_total DECIMAL(12,2) CHECK (valor_total > 0),
-    data_assinatura DATE DEFAULT (CURRENT_DATE), 
+    idContrato INT PRIMARY KEY AUTO_INCREMENT,
+    tipo_contrato VARCHAR(100),
+    valor_total DECIMAL(15, 2) NOT NULL,
+    data_assinatura DATE,
+    idServico INT,
     FOREIGN KEY (idServico) REFERENCES Servico(idServico)
 );
 
+
 CREATE TABLE Transacao (
-    idTransacao INT PRIMARY KEY,
-    idCliente INT NOT NULL,
-    dataHora DATETIME DEFAULT CURRENT_TIMESTAMP, 
-    FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente)
+    idTransacao INT PRIMARY KEY AUTO_INCREMENT,
+    dataHora DATETIME DEFAULT CURRENT_TIMESTAMP,
+    idConta INT,
+    FOREIGN KEY (idConta) REFERENCES Conta(idConta)
 );
+
 
 CREATE TABLE Saque (
     idTransacao INT PRIMARY KEY,
     tipo_saque VARCHAR(50),
-    limite_utilizado DECIMAL(12,2) DEFAULT 0 CHECK (limite_utilizado >= 0),
-    valor_saque DECIMAL(12,2) CHECK (valor_saque > 0), 
-    FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
+    limite_utilizado DECIMAL(10, 2),
+    valor_saque DECIMAL(15, 2) NOT NULL,
+    FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao),
+    CHECK (valor_saque > 0)
 );
+
 
 CREATE TABLE Deposito (
     idTransacao INT PRIMARY KEY,
-    origem_valor VARCHAR(100),
+    origem_valor VARCHAR(255),
     metodo_deposito VARCHAR(50),
-    valor_deposito DECIMAL(12,2) CHECK (valor_deposito > 0), 
+    valor_deposito DECIMAL(15, 2) NOT NULL,
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
 );
 
 
 CREATE TABLE Recibo (
-    idRecibo INT PRIMARY KEY,
-    idTransacao INT NOT NULL,
-    data_emissao DATE DEFAULT (CURRENT_DATE),
-    tipo_transacao VARCHAR(50),
-    valor_recibo DECIMAL(12,2) CHECK (valor_recibo > 0),
-    FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao)
-);
-
-ALTER TABLE Funcionario
-MODIFY idSupervisor INT NULL;
-
-ALTER TABLE Funcionario
-ADD CONSTRAINT fk_funcionario_supervisor
-FOREIGN KEY (idSupervisor) REFERENCES Funcionario(idFuncionario)
-ON DELETE SET NULL;
-
-ALTER TABLE Possui
-ADD CONSTRAINT fk_possui_cliente
-FOREIGN KEY (codCliente) REFERENCES Cliente(idCliente)
-ON UPDATE CASCADE;
-
-ALTER TABLE Possui
-ADD CONSTRAINT fk_possui_banco
-FOREIGN KEY (codBanco) REFERENCES Banco(idBanco)
-ON UPDATE CASCADE;
+    idRecibo INT PRIMARY KEY AUTO_INCREMENT,
+    data_emissao DATE NOT NULL,
+    tipo_transacao VARCHAR(100),
+    valor_recibo DECIMAL(15, 2) NOT NULL,
+    idTransacao INT,
+    FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao));
