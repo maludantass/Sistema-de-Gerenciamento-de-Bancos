@@ -1,38 +1,6 @@
 USE SISTEMA_BANCOS;
 
-INSERT INTO Banco (idBanco, nome, CNPJ) VALUES
-(1,  'Banco do Brasil',  '00.000.000/0001-91'),
-(2,  'Banco Inter',  '00.416.968/0001-01'),
-(3,  'Banco Safra',  '58.160.789/0001-28'),
-(4,  'Bradesco',  '60.746.948/0001-12'),
-(5,  'C6 Bank',  '31.872.495/0001-72'),
-(6,  'Caixa Econômica Federal',  '00.360.305/0001-04'),
-(7,  'Itaú Unibanco',  '60.701.190/0001-04'),
-(8,  'Nubank',  '18.236.120/0001-58'),
-(9,  'Santander Brasil',  '90.400.888/0001-42'),
-(10, 'XP', '02.332.886/0001-04'),
-(11, 'Banco 11', '00000000000011'),
-(12, 'Banco 12', '00000000000012'),
-(13, 'Banco 13', '00000000000013'),
-(14, 'Banco 14', '00000000000014'),
-(15, 'Banco 15', '00000000000015'),
-(16, 'Banco 16', '00000000000016'),
-(17, 'Banco 17', '00000000000017'),
-(18, 'Banco 18', '00000000000018'),
-(19, 'Banco 19', '00000000000019'),
-(20, 'Banco 20', '00000000000020'),
-(21, 'Banco 21', '00000000000021'),
-(22, 'Banco 22', '00000000000022'),
-(23, 'Banco 23', '00000000000023'),
-(24, 'Banco 24', '00000000000024'),
-(25, 'Banco 25', '00000000000025'),
-(26, 'Banco 26', '00000000000026'),
-(27, 'Banco 27', '00000000000027'),
-(28, 'Banco 28', '00000000000028'),
-(29, 'Banco 29', '00000000000029'),
-(30, 'Banco 30', '00000000000030');
-
-INSERT INTO Cliente (idCliente, nome, rua, numero, CEP) VALUES
+INSERT INTO Cliente (id_Cliente, nome, rua, numero, CEP) VALUES
 (1, 'Lucas', 'Boa Viagem', '101', '50010001'),
 (2, 'Henrique', 'Pina', '102', '50010002'),
 (3, 'Maria Regina Moraes', 'Encruzilhada', '103', '50010003'),
@@ -43,6 +11,7 @@ INSERT INTO Cliente (idCliente, nome, rua, numero, CEP) VALUES
 (8, 'Julya Micaely da Silva', 'Dois irmãos', '108', '50010008'),
 (9, 'Irvin', 'Aldeia', '109', '50010009'),
 (10, 'Juliana Lima', 'Casa Forte', '110', '50010010'),
+
 (11, 'Lídia', 'Poço da Panela', '111', '50010011'),
 (12, 'Sofia Duarte', 'Ilha do leite', '112', '50010012'),
 (13, 'Nina Zilá', 'Boa viagem', '113', '50010013'),
@@ -66,7 +35,7 @@ INSERT INTO Cliente (idCliente, nome, rua, numero, CEP) VALUES
 (31, 'Julia Maria', 'Barra de Jangada', '131', '50010031'),
 (32, 'Letícia', 'Rio Doce / Olinda', '132', '50010032');
 
-INSERT INTO Solicitacao (idSolicitacao) VALUES
+INSERT INTO Solicitacao (id_solicitacao) VALUES
 (1),(2),(3),(4),(5),
 (6),(7),(8),(9),(10),
 (11),(12),(13),(14),(15),
@@ -74,40 +43,40 @@ INSERT INTO Solicitacao (idSolicitacao) VALUES
 (21),(22),(23),(24),(25),
 (26),(27),(28),(29),(30);
 
-INSERT INTO Funcionario (idFuncionario, idBanco, nome, funcao, solicitacao, idSupervisor) VALUES
-(1,  1,  'Funcionario 1',  'Gerente',    1,   NULL),
-(2,  2,  'Funcionario 2',  'Atendente',  2,   1),
-(3,  3,  'Funcionario 3',  'Atendente',  3,   2),
-(4,  4,  'Funcionario 4',  'Atendente',  4,   3),
-(5,  5,  'Funcionario 5',  'Atendente',  5,   4),
-(6,  6,  'Funcionario 6',  'Gerente',    6,   NULL),
-(7,  7,  'Funcionario 7',  'Atendente',  7,   5),
-(8,  8,  'Funcionario 8',  'Atendente',  8,   6),
-(9,  9,  'Funcionario 9',  'Atendente',  9,   7),
-(10, 10, 'Funcionario 10', 'Atendente', 10,   8),
-(11, 11, 'Funcionario 11', 'Gerente',   11,   NULL),
-(12, 12, 'Funcionario 12', 'Atendente', 12,   11),
-(13, 13, 'Funcionario 13', 'Atendente', 13,   8),
-(14, 14, 'Funcionario 14', 'Atendente', 14,   12),
-(15, 15, 'Funcionario 15', 'Atendente', 15,   9),
-(16, 16, 'Funcionario 16', 'Gerente',   16,   NULL),
-(17, 17, 'Funcionario 17', 'Atendente', 17,   10),
-(18, 18, 'Funcionario 18', 'Atendente', 18,   16),
-(19, 19, 'Funcionario 19', 'Atendente', 19,   17),
-(20, 20, 'Funcionario 20', 'Atendente', 20,   19),
-(21, 21, 'Funcionario 21', 'Gerente',   21,   NULL),
-(22, 22, 'Funcionario 22', 'Atendente', 22,   6),
-(23, 23, 'Funcionario 23', 'Atendente', 23,   10),
-(24, 24, 'Funcionario 24', 'Atendente', 24,   21),
-(25, 25, 'Funcionario 25', 'Atendente', 25,   23),
-(26, 26, 'Funcionario 26', 'Gerente',   26,   NULL),
-(27, 27, 'Funcionario 27', 'Atendente', 27,   26),
-(28, 28, 'Funcionario 28', 'Atendente', 28,   2),
-(29, 29, 'Funcionario 29', 'Atendente', 29,   14),
-(30, 30, 'Funcionario 30', 'Atendente', 30,   17);
+INSERT INTO Funcionario (idFuncionario, nome, funcao, id_solicitacao, idSupervisor) VALUES
+(1,  'Funcionario 1',  'Gerente',    1,   NULL),
+(2,  'Funcionario 2',  'Atendente',  2,   1),
+(3,  'Funcionario 3',  'Atendente',  3,   2),
+(4,  'Funcionario 4',  'Atendente',  4,   3),
+(5,  'Funcionario 5',  'Atendente',  5,   4),
+(6,  'Funcionario 6',  'Gerente',    6,   NULL),
+(7,  'Funcionario 7',  'Atendente',  7,   5),
+(8,  'Funcionario 8',  'Atendente',  8,   6),
+(9,  'Funcionario 9',  'Atendente',  9,   7),
+(10, 'Funcionario 10', 'Atendente', 10,   8),
+(11, 'Funcionario 11', 'Gerente',   11,   NULL),
+(12, 'Funcionario 12', 'Atendente', 12,   11),
+(13, 'Funcionario 13', 'Atendente', 13,   8),
+(14, 'Funcionario 14', 'Atendente', 14,   12),
+(15, 'Funcionario 15', 'Atendente', 15,   9),
+(16, 'Funcionario 16', 'Gerente',   16,   NULL),
+(17, 'Funcionario 17', 'Atendente', 17,   10),
+(18, 'Funcionario 18', 'Atendente', 18,   16),
+(19, 'Funcionario 19', 'Atendente', 19,   17),
+(20, 'Funcionario 20', 'Atendente', 20,   19),
+(21, 'Funcionario 21', 'Gerente',   21,   NULL),
+(22, 'Funcionario 22', 'Atendente', 22,   6),
+(23, 'Funcionario 23', 'Atendente', 23,   10),
+(24, 'Funcionario 24', 'Atendente', 24,   21),
+(25, 'Funcionario 25', 'Atendente', 25,   23),
+(26, 'Funcionario 26', 'Gerente',   26,   NULL),
+(27, 'Funcionario 27', 'Atendente', 27,   26),
+(28, 'Funcionario 28', 'Atendente', 28,   2),
+(29, 'Funcionario 29', 'Atendente', 29,   14),
+(30, 'Funcionario 30', 'Atendente', 30,   17);
 
 
-INSERT INTO Telefone (Numero, idCliente) VALUES
+INSERT INTO Telefone (Numero, id_Cliente) VALUES
 ('(81)90001-0001', 1),
 ('(81)90002-0002', 2),
 ('(81)90003-0003', 3),
@@ -140,7 +109,7 @@ INSERT INTO Telefone (Numero, idCliente) VALUES
 ('(81)90030-0030', 30),
 ('(81)90031-0031', 31);
 
-INSERT INTO PessoaFisica (idCliente, sexo, idade, cpf) VALUES
+INSERT INTO PessoaFisica (id_Cliente, sexo, idade, cpf) VALUES
 (1, 'M', 19, '34253407749'),
 (2, 'M', 19, '95294384632'),
 (3, 'F', 19, '97171436681'),
@@ -174,140 +143,79 @@ INSERT INTO PessoaFisica (idCliente, sexo, idade, cpf) VALUES
 (31, 'F', 20, '10305601127'),
 (32, 'F', 27, '65862019962');
 
-INSERT INTO PessoaJuridica (idCliente, cnpj, tipo) VALUES
+INSERT INTO PessoaJuridica (id_Cliente, cnpj, tipo) VALUES
 (10, '269509124730', 'LTDA'),
 (14, '963444869875', 'LTDA'),
 (19, '193590387533', 'LTDA'),
 (20, '365436987295', 'LTDA'),
 (24, '287604488848', 'LTDA');
 
-INSERT INTO Possui (codCliente, codBanco) VALUES
-(1, 8),
-(1, 9),
-(1, 2),
-(2, 6),
-(2, 4),
-(2, 7),
-(2, 5),
-(3, 4),
-(3, 2),
-(4, 8),
-(4, 1),
-(4, 2),
-(5, 9),
-(6, 1),
-(7, 2),
-(7, 3),
-(8, 8),
-(9, 2),
-(10, 4),
-(10, 7),
-(11, 3),
-(12, 4),
-(12, 1),
-(13, 4),
-(13, 8),
-(14, 8),
-(14, 7),
-(14, 9),
-(14, 2),
-(15, 4),
-(15, 8),
-(15, 2),
-(16, 4),
-(17, 1),
-(17, 9),
-(18, 1),
-(19, 1),
-(20, 2),
-(21, 8),
-(21, 1),
-(22, 7),
-(23, 8),
-(23, 2),
-(24, 8),
-(25, 8),
-(25, 1),
-(26, 8),
-(26, 7),
-(26, 1),
-(27, 6),
-(27, 8),
-(27, 9),
-(28, 10),
-(29, 4),
-(29, 2),
-(30, 4),
-(30, 8),
-(31, 6),
-(31, 4),
-(31, 8),
-(32, 8);
 
-INSERT INTO Conta (idConta, idCliente, idBanco, agencia, numero, saldo) VALUES
-(1, 1, 8, '0008', '1001', 2500.00),
-(2, 1, 9, '0009', '1002', 3200.00),
-(3, 1, 2, '0002', '1003', 4100.00),
-(4, 2, 6, '0006', '1004', 5000.00),
-(5, 2, 4, '0004', '1005', 1500.00),
-(6, 2, 7, '0007', '1006', 2200.00),
-(7, 2, 5, '0005', '1007', 1800.00),
-(8, 3, 4, '0004', '1008', 2700.00),
-(9, 3, 2, '0002', '1009', 3500.00),
-(10, 4, 8, '0008', '1010', 2900.00),
-(11, 4, 1, '0001', '1011', 3100.00),
-(12, 4, 2, '0002', '1012', 4000.00),
-(13, 5, 9, '0009', '1013', 4500.00),
-(14, 6, 1, '0001', '1014', 3700.00),
-(15, 7, 2, '0002', '1015', 2800.00),
-(16, 7, 3, '0003', '1016', 2600.00),
-(17, 8, 8, '0008', '1017', 3900.00),
-(18, 9, 2, '0002', '1018', 4300.00),
-(19, 10, 4, '0004', '1019', 3000.00),
-(20, 10, 7, '0007', '1020', 3200.00),
-(21, 11, 3, '0003', '1021', 3500.00),
-(22, 12, 4, '0004', '1022', 2800.00),
-(23, 12, 1, '0001', '1023', 4100.00),
-(24, 13, 4, '0004', '1024', 2700.00),
-(25, 13, 8, '0008', '1025', 5000.00),
-(26, 14, 8, '0008', '1026', 4600.00),
-(27, 14, 7, '0007', '1027', 3800.00),
-(28, 14, 9, '0009', '1028', 4200.00),
-(29, 14, 2, '0002', '1029', 3500.00),
-(30, 15, 4, '0004', '1030', 2900.00),
-(31, 15, 8, '0008', '1031', 3100.00),
-(32, 15, 2, '0002', '1032', 2700.00),
-(33, 16, 4, '0004', '1033', 3000.00),
-(34, 17, 1, '0001', '1034', 3400.00),
-(35, 17, 9, '0009', '1035', 3600.00),
-(36, 18, 1, '0001', '1036', 4000.00),
-(37, 19, 1, '0001', '1037', 2200.00),
-(38, 20, 2, '0002', '1038', 3100.00),
-(39, 21, 8, '0008', '1039', 4300.00),
-(40, 21, 1, '0001', '1040', 3800.00),
-(41, 22, 7, '0007', '1041', 2600.00),
-(42, 23, 8, '0008', '1042', 4500.00),
-(43, 23, 2, '0002', '1043', 3000.00),
-(44, 24, 8, '0008', '1044', 3400.00),
-(45, 25, 8, '0008', '1045', 5000.00),
-(46, 25, 1, '0001', '1046', 3700.00),
-(47, 26, 8, '0008', '1047', 3200.00),
-(48, 26, 7, '0007', '1048', 2800.00),
-(49, 26, 1, '0001', '1049', 4000.00),
-(50, 27, 6, '0006', '1050', 3500.00),
-(51, 27, 8, '0008', '1051', 4300.00),
-(52, 27, 9, '0009', '1052', 3900.00),
-(53, 28, 10, '0010', '1053', 2600.00),
-(54, 29, 4, '0004', '1054', 3100.00),
-(55, 29, 2, '0002', '1055', 2800.00),
-(56, 30, 4, '0004', '1056', 4500.00),
-(57, 30, 8, '0008', '1057', 5000.00),
-(58, 31, 6, '0006', '1058', 3900.00),
-(59, 31, 4, '0004', '1059', 3400.00),
-(60, 31, 8, '0008', '1060', 3200.00),
-(61, 32, 8, '0008', '1061', 2800.00);
+INSERT INTO Conta (idConta, id_Cliente, agencia, numero, saldo) VALUES
+(1, 1, '0008', '1001', 2500.00),
+(2, 1, '0009', '1002', 3200.00),
+(3, 1, '0002', '1003', 4100.00),
+(4, 2, '0006', '1004', 5000.00),
+(5, 2, '0004', '1005', 1500.00),
+(6, 2, '0007', '1006', 2200.00),
+(7, 2, '0005', '1007', 1800.00),
+(8, 3, '0004', '1008', 2700.00),
+(9, 3, '0002', '1009', 3500.00),
+(10, 4, '0008', '1010', 2900.00),
+(11, 4, '0001', '1011', 3100.00),
+(12, 4, '0002', '1012', 4000.00),
+(13, 5, '0009', '1013', 4500.00),
+(14, 6, '0001', '1014', 3700.00),
+(15, 7, '0002', '1015', 2800.00),
+(16, 7, '0003', '1016', 2600.00),
+(17, 8, '0008', '1017', 3900.00),
+(18, 9, '0002', '1018', 4300.00),
+(19, 10, '0004', '1019', 3000.00),
+(20, 10, '0007', '1020', 3200.00),
+(21, 11, '0003', '1021', 3500.00),
+(22, 12, '0004', '1022', 2800.00),
+(23, 12, '0001', '1023', 4100.00),
+(24, 13, '0004', '1024', 2700.00),
+(25, 13, '0008', '1025', 5000.00),
+(26, 14, '0008', '1026', 4600.00),
+(27, 14, '0007', '1027', 3800.00),
+(28, 14, '0009', '1028', 4200.00),
+(29, 14, '0002', '1029', 3500.00),
+(30, 15, '0004', '1030', 2900.00),
+(31, 15, '0008', '1031', 3100.00),
+(32, 15, '0002', '1032', 2700.00),
+(33, 16, '0004', '1033', 3000.00),
+(34, 17, '0001', '1034', 3400.00),
+(35, 17, '0009', '1035', 3600.00),
+(36, 18, '0001', '1036', 4000.00),
+(37, 19, '0001', '1037', 2200.00),
+(38, 20, '0002', '1038', 3100.00),
+(39, 21, '0008', '1039', 4300.00),
+(40, 21, '0001', '1040', 3800.00),
+(41, 22, '0007', '1041', 2600.00),
+(42, 23, '0008', '1042', 4500.00),
+(43, 23, '0002', '1043', 3000.00),
+(44, 24, '0008', '1044', 3400.00),
+(45, 25, '0008', '1045', 5000.00),
+(46, 25, '0001', '1046', 3700.00),
+(47, 26, '0008', '1047', 3200.00),
+(48, 26, '0007', '1048', 2800.00),
+(49, 26, '0001', '1049', 4000.00),
+(50, 27, '0006', '1050', 3500.00),
+(51, 27, '0008', '1051', 4300.00),
+(52, 27, '0009', '1052', 3900.00),
+(53, 28, '0010', '1053', 2600.00),
+(54, 29, '0004', '1054', 3100.00),
+(55, 29, '0002', '1055', 2800.00),
+(56, 30, '0004', '1056', 4500.00),
+(57, 30, '0008', '1057', 5000.00),
+(58, 31, '0006', '1058', 3900.00),
+(59, 31, '0004', '1059', 3400.00),
+(60, 31, '0008', '1060', 3200.00),
+(61, 32, '0008', '1061', 2800.00);
 
-INSERT INTO ContaCorrente (idConta, tarifaMensal) VALUES
+
+INSERT INTO Conta_corrente (idConta, tarifaMensal) VALUES
 (1, 25.00),
 (3, 20.00),
 (5, 22.50),
@@ -339,7 +247,7 @@ INSERT INTO ContaCorrente (idConta, tarifaMensal) VALUES
 (54, 31.50),
 (56, 25.00);
 
-INSERT INTO ContaPoupanca (idConta, taxaRendimento) VALUES
+INSERT INTO Conta_Poupanca (idConta, taxaRendimento) VALUES
 (2, 1.5),
 (4, 2.0),
 (7, 1.8),
@@ -372,7 +280,7 @@ INSERT INTO ContaPoupanca (idConta, taxaRendimento) VALUES
 (60, 1.8),
 (61, 2.5);
 
-INSERT INTO Servico (idServico, idCliente, descricao_servico, taxa_juros, prazo_meses) VALUES
+INSERT INTO Servico (idServico, id_Cliente, descricao_servico, taxa_juros, prazo_meses) VALUES
 (1, 1, 'Empréstimo Pessoal', 5.5, 24),
 (2, 1, 'Financiamento Imobiliário', 6.5, 48),
 (3, 2, 'Empréstimo Consignado', 4.0, 36),
@@ -572,7 +480,7 @@ INSERT INTO Contrato (idContrato, idServico, tipo_contrato, valor_total, data_as
 (63, 63, 'Empréstimo', 18000, '2024-01-30'),
 (64, 64, 'Financiamento', 36000, '2023-10-10');
 
-INSERT INTO Transacao (idTransacao, idCliente, dataHora) VALUES
+INSERT INTO Transacao (idTransacao, idConta, dataHora) VALUES
 (20,  1, '2024-11-23 09:00:00'),
 (21,  2, '2024-05-20 11:25:00'),
 (22,  3, '2024-03-12 19:12:00'),
@@ -734,3 +642,138 @@ INSERT INTO Recibo (idRecibo, idTransacao, data_emissao, tipo_transacao, valor_r
 (159, 48, '2024-03-15', 'Saque', 610.00),
 (160, 49, '2024-03-16', 'Saque', 100.25),
 (161, 50, '2024-03-17', 'Saque', 310.00);
+
+INSERT INTO Pesquisa (titulo, descricao, id_respondente) VALUES
+('Satisfação com Atendimento', 'Avaliação geral do atendimento recebido no banco.', 1),
+('Uso de Serviços Online', 'Questionário sobre a experiência com o internet banking.', 2),
+('Cartão de Crédito', 'Opinião sobre limites, tarifas e benefícios do cartão.', 3),
+('Aplicativo Mobile', 'Facilidade de uso do app em smartphones.', 4),
+('Empréstimos Pessoais', 'Avaliação sobre taxas e prazos oferecidos.', 5),
+('Investimentos', 'Preferências em renda fixa, variável e fundos.', 6),
+('Atendimento Presencial', 'Qualidade do serviço em agências físicas.', 7),
+('Programas de Pontos', 'Interesse em programas de recompensas e milhas.', 8),
+('Segurança Digital', 'Percepção sobre a segurança nas transações online.', 9),
+('Conta Universitária', 'Satisfação com produtos voltados a estudantes.', 10),
+('Atendimento por Chat', 'Avalie a eficiência do chat online.', 11),
+('Seguro de Vida', 'Interesse e opinião sobre produtos de seguro.', 12),
+('Conta PJ', 'Experiência com conta empresarial.', 13),
+('Cartão Pré-pago', 'Avaliação sobre uso em viagens e controle de gastos.', 14),
+('Pagamentos Instantâneos', 'Uso e confiança no sistema de PIX.', 15),
+('Crédito Imobiliário', 'Opinião sobre condições de financiamento.', 16),
+('Notificações via App', 'Preferência por push, SMS ou e-mail.', 17),
+('Atendimento Telefônico', 'Tempo de espera e clareza das respostas.', 18),
+('Relacionamento Premium', 'Avaliação do serviço para clientes de alta renda.', 19),
+('Novos Produtos', 'Interesse em novos serviços financeiros.', 20),
+('Cashback', 'Percepção sobre programas de devolução de dinheiro.', 21),
+('Educação Financeira', 'Opinião sobre cursos e workshops oferecidos.', 22),
+('Cartão Internacional', 'Avaliação de taxas para compras no exterior.', 23),
+('Conta Digital', 'Experiência sem necessidade de agência física.', 24),
+('Transferências', 'Satisfação com TED, DOC e PIX.', 25),
+('Investimentos Sustentáveis', 'Interesse em fundos ESG.', 26),
+('Empréstimo Consignado', 'Avalie taxas para aposentados e servidores.', 27),
+('Fintechs Parceiras', 'Uso de serviços de parceiros do banco.', 28),
+('Open Banking', 'Percepção de segurança e utilidade.', 29),
+('Experiência Geral', 'Avaliação de todos os serviços do banco.', 30),
+('Atendimento Preferencial', 'Satisfação com fila prioritária e acessibilidade.', 31),
+('Novas Tecnologias', 'Interesse em biometria e reconhecimento facial.', 32);
+
+INSERT INTO Pergunta (texto, resposta) VALUES
+
+('Em uma escala de 1 a 5, qual seu nível de satisfação com o atendimento em geral?', '5'),
+
+('Com que frequência você utiliza o internet banking durante a semana?', 'Todos os dias'),
+
+('Você considera o limite atual do seu cartão adequado às suas necessidades?', 'Sim'),
+
+('O aplicativo do banco é intuitivo e fácil de navegar?', 'Sim, muito fácil'),
+
+('As taxas de juros oferecidas em empréstimos pessoais são competitivas?', 'Sim, dentro da média de mercado'),
+
+('Você prefere investir em renda fixa, variável ou ambos?', 'Ambos'),
+
+('O atendimento na agência foi rápido e eficiente?', 'Sim, tempo de espera inferior a 10 minutos'),
+
+('Você participa do programa de pontos do banco?', 'Sim, acumulo pontos mensalmente'),
+
+('Você se sente seguro ao realizar transações online?', 'Sim, plenamente seguro'),
+
+('A conta universitária atende às suas expectativas de tarifas e benefícios?', 'Sim, isenção de tarifas é excelente'),
+
+('O chat online resolveu seu problema de forma satisfatória?', 'Sim, em poucos minutos'),
+
+('Você possui ou teria interesse em contratar um seguro de vida do banco?', 'Sim, já possuo'),
+
+('A conta PJ oferece recursos suficientes para sua empresa?', 'Sim, atente bem às necessidades'),
+
+('Você utiliza cartão pré-pago em viagens?', 'Sim, principalmente no exterior'),
+
+('Você confia no sistema PIX para transações de alto valor?', 'Sim, sem restrições'),
+
+('As condições do crédito imobiliário foram satisfatórias?', 'Sim, taxa de juros competitiva'),
+
+('Qual método de notificação você prefere para movimentações da conta?', 'Notificações push no aplicativo'),
+
+('O tempo de espera no atendimento telefônico foi aceitável?', 'Sim, menos de 5 minutos'),
+
+('O serviço para clientes premium cumpre o prometido?', 'Sim, atendimento exclusivo e ágil'),
+
+('Você gostaria de mais opções de produtos de investimento?', 'Sim, especialmente fundos internacionais'),
+
+('O programa de cashback é atrativo para você?', 'Sim, retorno financeiro excelente'),
+
+('Você participaria de cursos de educação financeira oferecidos pelo banco?', 'Sim, com certeza'),
+
+('As taxas de uso do cartão internacional são justas?', 'Sim, taxa cambial aceitável'),
+
+('A conta digital supre todas as suas necessidades sem agência física?', 'Sim, totalmente online'),
+
+('Está satisfeito com a velocidade das transferências TED/DOC/PIX?', 'Sim, extremamente rápido'),
+
+('Tem interesse em produtos de investimento com foco ESG?', 'Sim, muito interesse'),
+
+('As taxas do empréstimo consignado são adequadas?', 'Sim, especialmente para aposentados'),
+
+('Você já utilizou serviços de fintechs parceiras do banco?', 'Sim, integração perfeita'),
+
+('Você confia em compartilhar seus dados no Open Banking?', 'Sim, me sinto seguro'),
+
+('De modo geral, como avalia a experiência com o banco?', 'Excelente, sem reclamações'),
+
+('O atendimento preferencial respeita as normas de prioridade?', 'Sim, atendimento imediato'),
+
+
+('Gostaria de ver mais tecnologias como biometria no app?', 'Sim, reconhecimento facial seria ótimo');
+
+INSERT INTO Contem (idPesquisa, idPergunta) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10),
+(11, 11),
+(12, 12),
+(13, 13),
+(14, 14),
+(15, 15),
+(16, 16),
+(17, 17),
+(18, 18),
+(19, 19),
+(20, 20),
+(21, 21),
+(22, 22),
+(23, 23),
+(24, 24),
+(25, 25),
+(26, 26),
+(27, 27),
+(28, 28),
+(29, 29),
+(30, 30),
+(31, 31),
+(32, 32);
