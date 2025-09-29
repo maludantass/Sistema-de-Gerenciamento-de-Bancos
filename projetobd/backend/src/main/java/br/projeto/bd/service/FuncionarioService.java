@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.projeto.bd.dto.FuncionarioSupervisorDTO;
 import br.projeto.bd.entity.Funcionario;
+import br.projeto.bd.exception.SolicitacaoInvalidaException;
 import br.projeto.bd.repository.FuncionarioRepository;
 
 @Service
@@ -17,6 +18,11 @@ public class FuncionarioService {
     private FuncionarioRepository funcionarioRepository;
 
     public Funcionario criarFuncionario(Funcionario funcionario) {
+        if (funcionario.getId_solicitacao() != null || funcionario.getIdSupervisor() != null ) {
+            throw new SolicitacaoInvalidaException(
+            "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
+        );
+        }   
         return funcionarioRepository.save(funcionario);
     }
 
@@ -30,8 +36,13 @@ public class FuncionarioService {
 
     public Funcionario atualizarFuncionario(Integer id, Funcionario funcionarioDetails) {
         // Garante que estamos atualizando o funcionário correto
-        funcionarioDetails.setIdFuncionario(id); 
-        funcionarioRepository.update(funcionarioDetails);
+        funcionarioDetails.setIdFuncionario(id);
+        if (funcionarioDetails.getIdSupervisor() != null || funcionarioDetails.getId_solicitacao() != null) {
+            throw new SolicitacaoInvalidaException(  
+            "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
+        );
+        }   
+        funcionarioRepository.update(funcionarioDetails);  
         return funcionarioDetails;
     }
 

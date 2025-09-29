@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import br.projeto.bd.dto.ParContasAgenciaDTO;
 import br.projeto.bd.entity.Conta;
+import br.projeto.bd.exception.SolicitacaoInvalidaException;
 import br.projeto.bd.repository.ContaRepository;
 
 @Service
@@ -21,6 +22,12 @@ public class ContaService {
         // Regra de negócio: Saldo inicial não pode ser nulo
         if (conta.getSaldo() == null) {
             conta.setSaldo(java.math.BigDecimal.ZERO);
+        }
+        if (conta.getid_Cliente() != null) {
+            throw new SolicitacaoInvalidaException(
+            "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
+        );
+          
         }
         return contaRepository.save(conta);
     }
@@ -35,6 +42,12 @@ public class ContaService {
 
     public Conta atualizarConta(Integer id, Conta contaDetails) {
         contaDetails.setIdConta(id);
+        if (contaDetails.getid_Cliente() != null) {
+            throw new SolicitacaoInvalidaException(
+            "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
+        );
+            
+        }
         contaRepository.update(contaDetails);
         return contaDetails;
     }
