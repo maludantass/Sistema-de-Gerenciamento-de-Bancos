@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import br.projeto.bd.dto.FuncionarioSupervisorDTO;
 import br.projeto.bd.entity.Funcionario;
 
 @Repository
@@ -86,5 +87,40 @@ public class FuncionarioRepository {
     public int deleteById(Integer id) {
         String sql = "DELETE FROM Funcionario WHERE idFuncionario = ?";
         return jdbcTemplate.update(sql, id);
+    }
+
+    // --- NOVAS CONSULTAS ADICIONADAS ---
+
+    /**
+     * CONSULTA COM SELF JOIN - Busca todos os funcionários e o nome de seu supervisor.
+     * Usamos LEFT JOIN para incluir funcionários que não têm supervisor.
+     */
+    public List<FuncionarioSupervisorDTO> findAllWithSupervisorName() {
+        String sql = "SELECT f.idFuncionario, f.nome AS nome_funcionario, f.funcao, s.nome AS nome_supervisor " +
+                     "FROM Funcionario f " +
+                     "LEFT JOIN Funcionario s ON f.idSupervisor = s.idFuncionario";
+
+        RowMapper<FuncionarioSupervisorDTO> dtoRowMapper = (rs, rowNum) -> {
+            FuncionarioSupervisorDTO dto = new FuncionarioSupervisorDTO();
+            dto.setIdFuncionario(rs.getInt("idFuncionario"));
+            dto.setNomeFuncionario(rs.getString("nome_funcionario"));
+            dto.setFuncao(rs.getString("funcao"));
+            dto.setNomeSupervisor(rs.getString("nome_supervisor")); // Pode ser NULL
+            return dto;
+        };
+
+        return jdbcTemplate.query(sql, dtoRowMapper);
+    }
+
+    /**
+     * CONSULTA COMPLEXA - Busca todos os funcionários que são supervisores de alguém.
+     * Utiliza uma subconsulta para encontrar todos os IDs que aparecem na coluna idSupervisor.
+     */
+    public List<Funcionario> findAllSupervisores() {
+        String sql = "SELECT * FROM Funcionario WHERE idFuncionario IN " +
+                     "(SELECT DISTINCT idSupervisor FROM Funcionario WHERE idSupervisor IS NOT NULL)";
+        
+        // Reutilizamos o RowMapper original, pois o resultado é uma lista de Funcionarios.
+        return jdbcTemplate.query(sql, rowMapper);
     }
 }

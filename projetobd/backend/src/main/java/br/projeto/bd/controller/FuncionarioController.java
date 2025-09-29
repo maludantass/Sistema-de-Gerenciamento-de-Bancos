@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.projeto.bd.dto.FuncionarioSupervisorDTO;
 import br.projeto.bd.entity.Funcionario;
 import br.projeto.bd.service.FuncionarioService;
 
@@ -67,5 +68,25 @@ public class FuncionarioController {
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+      // --- NOVOS ENDPOINTS ---
+
+    /**
+     * Endpoint para a consulta com SELF JOIN.
+     * GET /api/funcionarios/com-supervisor
+     */
+    @GetMapping("/com-supervisor")
+    public List<FuncionarioSupervisorDTO> getFuncionariosComSupervisor() {
+        return funcionarioService.listarFuncionariosComSupervisor();
+    }
+    
+    /**
+     * Endpoint para a consulta complexa que busca apenas supervisores.
+     * GET /api/funcionarios/supervisores
+     */
+    @GetMapping("/supervisores")
+    public List<Funcionario> getApenasSupervisores() {
+        return funcionarioService.listarApenasSupervisores();
     }
 }

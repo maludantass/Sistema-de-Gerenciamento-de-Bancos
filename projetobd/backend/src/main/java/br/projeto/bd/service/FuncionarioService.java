@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.projeto.bd.dto.FuncionarioSupervisorDTO;
 import br.projeto.bd.entity.Funcionario;
 import br.projeto.bd.repository.FuncionarioRepository;
 
@@ -36,5 +37,20 @@ public class FuncionarioService {
 
     public void deletarFuncionario(Integer id) {
         funcionarioRepository.deleteById(id);
+    }
+     // --- NOVOS MÉTODOS DE SERVIÇO ---
+
+    /**
+     * Chama o repositório para listar funcionários com o nome do supervisor.
+     */
+    public List<FuncionarioSupervisorDTO> listarFuncionariosComSupervisor() {
+        return funcionarioRepository.findAllWithSupervisorName();
+    }
+
+    /**
+     * Chama o repositório para listar todos os funcionários que são supervisores.
+     */
+    public List<Funcionario> listarApenasSupervisores() {
+        return funcionarioRepository.findAllSupervisores();
     }
 }

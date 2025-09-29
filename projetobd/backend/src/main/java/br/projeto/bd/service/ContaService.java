@@ -1,11 +1,13 @@
 package br.projeto.bd.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.projeto.bd.dto.ParContasAgenciaDTO;
 import br.projeto.bd.entity.Conta;
 import br.projeto.bd.repository.ContaRepository;
 
@@ -39,5 +41,21 @@ public class ContaService {
 
     public void deletarConta(Integer id) {
         contaRepository.deleteById(id);
+    }
+
+     // --- NOVOS MÉTODOS DE SERVIÇO ---
+
+    /**
+     * Chama o repositório para encontrar pares de contas na mesma agência.
+     */
+    public List<ParContasAgenciaDTO> encontrarParesDeContasPorAgencia() {
+        return contaRepository.findParesDeContasNaMesmaAgencia();
+    }
+
+    /**
+     * Chama o repositório para buscar contas por faixa de saldo.
+     */
+    public List<Conta> buscarContasPorFaixaDeSaldo(BigDecimal saldoMin, BigDecimal saldoMax) {
+        return contaRepository.findBySaldoBetweenOrderBySaldoDesc(saldoMin, saldoMax);
     }
 }

@@ -1,5 +1,6 @@
 package br.projeto.bd.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.projeto.bd.dto.ParContasAgenciaDTO;
 import br.projeto.bd.entity.Conta;
 import br.projeto.bd.service.ContaService;
 
@@ -65,5 +68,28 @@ public class ContaController {
                     return ResponseEntity.noContent().<Void>build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+
+     // --- NOVOS ENDPOINTS ---
+
+    /**
+     * Endpoint para a consulta com SELF JOIN.
+     * GET /api/contas/pares-por-agencia
+     */
+    @GetMapping("/pares-por-agencia")
+    public List<ParContasAgenciaDTO> getParesDeContasPorAgencia() {
+        return contaService.encontrarParesDeContasPorAgencia();
+    }
+
+    /**
+     * Endpoint para a consulta complexa (busca por faixa de saldo).
+     * GET /api/contas/buscar-por-saldo?min=1000&max=5000
+     */
+    @GetMapping("/buscar-por-saldo")
+    public List<Conta> getContasPorFaixaDeSaldo(
+            @RequestParam("min") BigDecimal saldoMin,
+            @RequestParam("max") BigDecimal saldoMax) {
+        return contaService.buscarContasPorFaixaDeSaldo(saldoMin, saldoMax);
     }
 }
