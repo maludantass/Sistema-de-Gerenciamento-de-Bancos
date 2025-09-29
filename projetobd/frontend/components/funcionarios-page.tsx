@@ -34,7 +34,6 @@ export function FuncionariosPage() {
       "todos",
   )
 
-  const [searchNome, setSearchNome] = useState<string>("")
   const [searchId, setSearchId] = useState<string>("")
   const [funcionarioEncontrado, setFuncionarioEncontrado] = useState<Funcionario | null>(null)
 
@@ -119,39 +118,6 @@ export function FuncionariosPage() {
   const showAllFuncionarios = () => {
     setActiveFilter("todos")
     fetchFuncionarios()
-  }
-
-  const buscarPorNome = async () => {
-    if (!searchNome.trim()) {
-      alert("Por favor, digite um nome para buscar.")
-      return
-    }
-
-    try {
-      setLoading(true)
-      console.log("[v0] Buscando funcionário por nome:", searchNome)
-      const response = await fetch(`http://localhost:8080/api/funcionarios/nome/${encodeURIComponent(searchNome)}`)
-
-      if (response.ok) {
-        const data = await response.json()
-        console.log("[v0] Funcionário encontrado:", data)
-        if (data) {
-          setFuncionarioEncontrado(data)
-          setActiveFilter("busca-individual")
-        } else {
-          alert("Nenhum funcionário encontrado com esse nome.")
-        }
-      } else if (response.status === 404) {
-        alert("Funcionário não encontrado com esse nome.")
-      } else {
-        alert("Erro ao buscar funcionário por nome.")
-      }
-    } catch (error) {
-      console.log("[v0] Erro:", error)
-      alert("Erro de conexão.")
-    } finally {
-      setLoading(false)
-    }
   }
 
   const buscarPorId = async () => {
@@ -338,38 +304,21 @@ export function FuncionariosPage() {
               <div className="border-t pt-4 space-y-4">
                 <Label className="text-sm font-medium text-foreground">Busca Individual</Label>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-3">
-                    <Label className="text-xs text-muted-foreground">Buscar por Nome</Label>
-                    <div className="flex gap-2">
-                      <Input
-                          value={searchNome}
-                          onChange={(e) => setSearchNome(e.target.value)}
-                          placeholder="Digite o nome do funcionário"
-                          className="flex-1"
-                      />
-                      <Button onClick={buscarPorNome} variant="outline" className="gap-2 bg-transparent">
-                        <Users className="w-4 h-4" />
-                        Buscar
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-xs text-muted-foreground">Buscar por ID</Label>
-                    <div className="flex gap-2">
-                      <Input
-                          type="number"
-                          value={searchId}
-                          onChange={(e) => setSearchId(e.target.value)}
-                          placeholder="Digite o ID do funcionário"
-                          className="flex-1"
-                      />
-                      <Button onClick={buscarPorId} variant="outline" className="gap-2 bg-transparent">
-                        <Filter className="w-4 h-4" />
-                        Buscar
-                      </Button>
-                    </div>
+                <div className="space-y-3">
+                  <Label className="text-xs text-muted-foreground">Buscar por ID</Label>
+                  <div className="flex gap-2">
+                    <Input
+                        type="number"
+                        value={searchId}
+                        onChange={(e) => setSearchId(e.target.value)}
+                        placeholder="Digite o ID do funcionário"
+                        className="flex-1"
+                        onKeyDown={(e) => e.key === "Enter" && buscarPorId()}
+                    />
+                    <Button onClick={buscarPorId} variant="outline" className="gap-2 bg-transparent">
+                      <Filter className="w-4 h-4" />
+                      Buscar
+                    </Button>
                   </div>
                 </div>
               </div>
