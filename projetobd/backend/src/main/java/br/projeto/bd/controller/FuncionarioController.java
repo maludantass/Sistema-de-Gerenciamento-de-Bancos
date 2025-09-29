@@ -78,6 +78,7 @@ public class FuncionarioController {
      */
     @GetMapping("/com-supervisor")
     public List<FuncionarioSupervisorDTO> getFuncionariosComSupervisor() {
+        
         return funcionarioService.listarFuncionariosComSupervisor();
     }
     

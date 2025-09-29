@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import br.projeto.bd.dto.FuncionarioSupervisorDTO;
 import br.projeto.bd.entity.Funcionario;
 import br.projeto.bd.exception.SolicitacaoInvalidaException;
+import br.projeto.bd.exception.SupervisorNaoEncontradoException;
 import br.projeto.bd.repository.FuncionarioRepository;
 
 @Service
@@ -18,11 +19,28 @@ public class FuncionarioService {
     private FuncionarioRepository funcionarioRepository;
 
     public Funcionario criarFuncionario(Funcionario funcionario) {
-        if (funcionario.getId_solicitacao() != null || funcionario.getIdSupervisor() != null ) {
+        // Validação 1: Mantemos a regra para a solicitação
+        if (funcionario.getId_solicitacao() != null) {
             throw new SolicitacaoInvalidaException(
-            "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
-        );
-        }   
+                "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
+            );
+        }
+
+        // Validação 2: Verificamos a existência do supervisor, SE um ID for fornecido
+        if (funcionario.getIdSupervisor() != null) {
+            // Busca no banco se existe um funcionário com o ID do supervisor informado
+            boolean supervisorExiste = funcionarioRepository.findById(funcionario.getIdSupervisor()).isPresent();
+            
+            // Se o método 'findById' retornar um Optional vazio, o supervisor não existe.
+            if (!supervisorExiste) {
+                // Lançamos nossa nova exceção específica
+                throw new SupervisorNaoEncontradoException(
+                    "O supervisor com o ID " + funcionario.getIdSupervisor() + " não foi encontrado no sistema."
+                );
+            }
+        }
+
+        // Se todas as validações passaram, podemos salvar o novo funcionário.
         return funcionarioRepository.save(funcionario);
     }
 

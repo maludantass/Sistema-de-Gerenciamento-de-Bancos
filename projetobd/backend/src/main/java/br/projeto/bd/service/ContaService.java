@@ -64,7 +64,7 @@ public class ContaService {
     public List<ParContasAgenciaDTO> encontrarParesDeContasPorAgencia() {
         return contaRepository.findParesDeContasNaMesmaAgencia();
     }
-
+    
     /**
      * Chama o repositório para buscar contas por faixa de saldo.
      */

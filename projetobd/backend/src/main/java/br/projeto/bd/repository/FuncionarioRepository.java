@@ -99,16 +99,16 @@ public class FuncionarioRepository {
     public List<FuncionarioSupervisorDTO> findAllWithSupervisorName() {
         String sql = "SELECT f.idFuncionario, f.nome AS nome_funcionario, f.funcao, s.nome AS nome_supervisor " +
                      "FROM Funcionario f " +
-                     "LEFT JOIN Funcionario s ON f.idSupervisor = s.idFuncionario";
+                     "INNER JOIN Funcionario s ON f.idSupervisor = s.idFuncionario"; // <-- AQUI ESTÁ A MUDANÇA
 
         RowMapper<FuncionarioSupervisorDTO> dtoRowMapper = (rs, rowNum) -> {
             FuncionarioSupervisorDTO dto = new FuncionarioSupervisorDTO();
             dto.setIdFuncionario(rs.getInt("idFuncionario"));
             dto.setNomeFuncionario(rs.getString("nome_funcionario"));
             dto.setFuncao(rs.getString("funcao"));
-            dto.setNomeSupervisor(rs.getString("nome_supervisor")); // Pode ser NULL
+            dto.setNomeSupervisor(rs.getString("nome_supervisor"));
             return dto;
-        };
+        };  
 
         return jdbcTemplate.query(sql, dtoRowMapper);
     }
