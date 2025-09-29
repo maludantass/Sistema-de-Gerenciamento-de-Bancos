@@ -3,11 +3,11 @@ USE SISTEMA_BANCOS;
 
 
 CREATE TABLE Solicitacao (
-    id_solicitacao INT PRIMARY KEY AUTO_INCREMENT
+    id_solicitacao INT PRIMARY KEY 
 );
 
 CREATE TABLE Funcionario (
-    idFuncionario INT PRIMARY KEY AUTO_INCREMENT,
+    idFuncionario INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     funcao VARCHAR(100),
     id_solicitacao INT,
@@ -17,7 +17,7 @@ CREATE TABLE Funcionario (
 );
 
 CREATE TABLE Cliente (
-    id_Cliente INT PRIMARY KEY AUTO_INCREMENT,
+    id_Cliente INT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     rua VARCHAR(255),
     numero VARCHAR(20),
@@ -26,7 +26,7 @@ CREATE TABLE Cliente (
 
 
 CREATE TABLE Pesquisa (
-    idPesquisa INT PRIMARY KEY AUTO_INCREMENT,
+    idPesquisa INT PRIMARY KEY,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT,
     id_respondente INT,
@@ -35,7 +35,7 @@ CREATE TABLE Pesquisa (
 
 
 CREATE TABLE Pergunta (
-    idPergunta INT PRIMARY KEY AUTO_INCREMENT,
+    idPergunta INT PRIMARY KEY,
     texto TEXT NOT NULL,
     resposta TEXT
 );
@@ -76,7 +76,7 @@ CREATE TABLE PessoaJuridica (
 
 
 CREATE TABLE Conta (
-    idConta INT PRIMARY KEY AUTO_INCREMENT,
+    idConta INT PRIMARY KEY,
     agencia VARCHAR(10) NOT NULL,
     numero VARCHAR(20) NOT NULL,
     saldo DECIMAL(15, 2) DEFAULT 0.00,
@@ -103,7 +103,7 @@ CREATE TABLE Conta_poupanca (
 
 
 CREATE TABLE Servico (
-    idServico INT PRIMARY KEY AUTO_INCREMENT,
+    idServico INT PRIMARY KEY,
     descricao_servico TEXT,
     taxa_juros DECIMAL(5, 4),
     prazo_meses INT,
@@ -130,7 +130,7 @@ CREATE TABLE Financiamento (
 
 
 CREATE TABLE Contrato (
-    idContrato INT PRIMARY KEY AUTO_INCREMENT,
+    idContrato INT PRIMARY KEY,
     tipo_contrato VARCHAR(100),
     valor_total DECIMAL(15, 2) NOT NULL,
     data_assinatura DATE,
@@ -140,7 +140,7 @@ CREATE TABLE Contrato (
 
 
 CREATE TABLE Transacao (
-    idTransacao INT PRIMARY KEY AUTO_INCREMENT,
+    idTransacao INT PRIMARY KEY,
     dataHora DATETIME DEFAULT CURRENT_TIMESTAMP,
     idConta INT,
     FOREIGN KEY (idConta) REFERENCES Conta(idConta)
@@ -167,7 +167,7 @@ CREATE TABLE Deposito (
 
 
 CREATE TABLE Recibo (
-    idRecibo INT PRIMARY KEY AUTO_INCREMENT,
+    idRecibo INT PRIMARY KEY,
     data_emissao DATE NOT NULL,
     tipo_transacao VARCHAR(100),
     valor_recibo DECIMAL(15, 2) NOT NULL,

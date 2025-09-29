@@ -34,8 +34,9 @@ public class FuncionarioRepository {
      * CREATE - Insere um novo funcionário no banco de dados.
      */
     public Funcionario save(Funcionario funcionario) {
-        String sql = "INSERT INTO Funcionario (nome, funcao, id_solicitacao, idSupervisor) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Funcionario (idFuncionario, nome, funcao, id_solicitacao, idSupervisor) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql, 
+            funcionario.getIdFuncionario(),
             funcionario.getNome(), 
             funcionario.getFuncao(), 
             funcionario.getId_solicitacao(), 

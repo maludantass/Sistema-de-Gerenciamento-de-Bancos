@@ -34,10 +34,11 @@ public class ContaRepository {
      * CREATE - Insere uma nova conta.
      */
     public Conta save(Conta conta) {
-        String sql = "INSERT INTO Conta (agencia, numero, saldo, id_Cliente) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Conta (idConta,agencia, numero, saldo, id_Cliente) VALUES (?, ?, ?, ?, ?)";
         jdbcTemplate.update(sql,
+                conta.getIdConta(),
                 conta.getAgencia(),
-                conta.getNumero(),
+                conta.getNumero(), 
                 conta.getSaldo(),
                 conta.getid_Cliente()
         );
