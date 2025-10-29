@@ -1,7 +1,11 @@
 package br.projeto.bd.service;
 
+import java.sql.Connection; // Import necessário
+import java.sql.SQLException; // Import necessário
 import java.util.List;
 import java.util.Optional;
+
+import javax.sql.DataSource; // Import necessário
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,9 +18,12 @@ import br.projeto.bd.repository.FuncionarioRepository;
 
 @Service
 public class FuncionarioService {
-  
+    
     @Autowired
     private FuncionarioRepository funcionarioRepository;
+
+    @Autowired // Adicionado para gerenciar a conexão JDBC nas consultas manuais
+    private DataSource dataSource; 
 
     public Funcionario criarFuncionario(Funcionario funcionario) {
         // Validação 1: Mantemos a regra para a solicitação
@@ -59,7 +66,7 @@ public class FuncionarioService {
             throw new SolicitacaoInvalidaException(  
             "Não é permitido associar uma solicitação na criação do funcionário. Este campo deve ser nulo."
         );
-        }   
+        }  
         funcionarioRepository.update(funcionarioDetails);  
         return funcionarioDetails;
     }
@@ -67,19 +74,50 @@ public class FuncionarioService {
     public void deletarFuncionario(Integer id) {
         funcionarioRepository.deleteById(id);
     }
-     // --- NOVOS MÉTODOS DE SERVIÇO ---
+    
+    // --- MÉTODOS DE SERVIÇO EXISTENTES ---
 
     /**
-     * Chama o repositório para listar funcionários com o nome do supervisor.
+     * Chama o repositório para listar funcionários com o nome do supervisor (SELF JOIN com JdbcTemplate).
      */
     public List<FuncionarioSupervisorDTO> listarFuncionariosComSupervisor() {
         return funcionarioRepository.findAllWithSupervisorName();
     }
 
     /**
-     * Chama o repositório para listar todos os funcionários que são supervisores.
+     * Chama o repositório para listar todos os funcionários que são supervisores (SUBCONSULTA IN).
      */
     public List<Funcionario> listarApenasSupervisores() {
         return funcionarioRepository.findAllSupervisores();
+    }
+    
+    // ------------------------------------------
+    // --- NOVOS MÉTODOS DE SERVIÇO ADICIONADOS ---
+    // ------------------------------------------
+
+    /**
+     * Encontra funcionários que não supervisionam ninguém (ANTI JOIN).
+     * Gerencia a Connection e a passa para o Repository.
+     */
+    public List<Funcionario> encontrarNaoSupervisores() {
+        try (Connection conn = dataSource.getConnection()) {
+            return funcionarioRepository.findFuncionariosQueNaoSaoSupervisores(conn);
+        } catch (SQLException e) {
+            // Em produção, use um logger e trate/lance exceções de forma adequada.
+            throw new RuntimeException("Erro ao buscar funcionários que não são supervisores: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Encontra funcionários que são supervisores (SUBCONSULTA CORRELACIONADA com EXISTS).
+     * Gerencia a Connection e a passa para o Repository.
+     */
+    public List<Funcionario> encontrarSupervisoresPorSubconsultaCorrelacionada() {
+        try (Connection conn = dataSource.getConnection()) {
+            return funcionarioRepository.findAllSupervisores(conn);
+        } catch (SQLException e) {
+            // Em produção, use um logger e trate/lance exceções de forma adequada.
+            throw new RuntimeException("Erro ao buscar supervisores por subconsulta correlacionada: " + e.getMessage(), e);
+        }
     }
 }

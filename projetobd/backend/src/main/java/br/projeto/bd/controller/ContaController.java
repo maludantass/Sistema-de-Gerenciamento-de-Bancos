@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.projeto.bd.dto.AuditoriaContaTransacaoDTO; // Import necessário
 import br.projeto.bd.dto.ParContasAgenciaDTO;
 import br.projeto.bd.entity.Conta;
 import br.projeto.bd.service.ContaService;
@@ -26,6 +27,8 @@ public class ContaController {
 
     @Autowired
     private ContaService contaService;
+
+    // ... (Métodos CRUD e os dois métodos novos que você já tinha)
 
     // CREATE -> POST /api/contas
     @PostMapping
@@ -44,7 +47,7 @@ public class ContaController {
     @GetMapping("/{id}")
     public ResponseEntity<Conta> buscarContaPorId(@PathVariable Integer id) {
         return contaService.buscarPorId(id)
-                .map(ResponseEntity::ok) // Forma abreviada de .map(conta -> ResponseEntity.ok(conta))
+                .map(ResponseEntity::ok) 
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -71,7 +74,7 @@ public class ContaController {
     }
 
 
-     // --- NOVOS ENDPOINTS ---
+    // --- NOVOS ENDPOINTS (EXISTENTES) ---
 
     /**
      * Endpoint para a consulta com SELF JOIN.
@@ -91,5 +94,28 @@ public class ContaController {
             @RequestParam("min") BigDecimal saldoMin,
             @RequestParam("max") BigDecimal saldoMax) {
         return contaService.buscarContasPorFaixaDeSaldo(saldoMin, saldoMax);
+    }
+
+    // --- NOVOS ENDPOINTS (CÓDIGO FALTANTE) ---
+
+    /**
+     * Endpoint para a CONSULTA 3: SUBCONSULTA.
+     * Busca contas que tiveram depósitos acima de um valor mínimo.
+     * GET /api/contas/depositos-acima?valor=500.00
+     */
+    @GetMapping("/depositos-acima")
+    public List<Conta> getContasComDepositosAcimaDe(
+            @RequestParam("valor") BigDecimal valorMinimo) {
+        return contaService.encontrarContasComDepositosAcimaDe(valorMinimo);
+    }
+
+    /**
+     * Endpoint para a CONSULTA 4: FULL OUTER JOIN (Relatório de Auditoria).
+     * Retorna um relatório de auditoria de Contas e Transações.
+     * GET /api/contas/relatorio-auditoria
+     */
+    @GetMapping("/relatorio-auditoria")
+    public List<AuditoriaContaTransacaoDTO> getRelatorioAuditoria() {
+        return contaService.gerarRelatorioAuditoriaContasTransacoes();
     }
 }

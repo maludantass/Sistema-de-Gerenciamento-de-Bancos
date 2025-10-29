@@ -62,7 +62,7 @@ public class FuncionarioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarFuncionario(@PathVariable Integer id) {
         // Verifica se o funcionário existe antes de deletar
-         return funcionarioService.buscarPorId(id)
+          return funcionarioService.buscarPorId(id)
                 .map(funcionario -> {
                     funcionarioService.deletarFuncionario(id);
                     return ResponseEntity.noContent().<Void>build();
@@ -70,7 +70,7 @@ public class FuncionarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-      // --- NOVOS ENDPOINTS ---
+    // --- NOVOS ENDPOINTS EXISTENTES (Antigos) ---
 
     /**
      * Endpoint para a consulta com SELF JOIN.
@@ -83,11 +83,33 @@ public class FuncionarioController {
     }
     
     /**
-     * Endpoint para a consulta complexa que busca apenas supervisores.
+     * Endpoint para a consulta complexa que busca apenas supervisores (SUBCONSULTA IN).
      * GET /api/funcionarios/supervisores
      */
     @GetMapping("/supervisores")
     public List<Funcionario> getApenasSupervisores() {
         return funcionarioService.listarApenasSupervisores();
+    }
+
+    // ------------------------------------------
+    // --- NOVOS ENDPOINTS ADICIONADOS ---
+    // ------------------------------------------
+
+    /**
+     * Endpoint para a CONSULTA 1: ANTI JOIN (Funcionários que NÃO são supervisores).
+     * GET /api/funcionarios/nao-supervisores
+     */
+    @GetMapping("/nao-supervisores")
+    public List<Funcionario> getFuncionariosQueNaoSaoSupervisores() {
+        return funcionarioService.encontrarNaoSupervisores();
+    }
+
+    /**
+     * Endpoint para a CONSULTA 2: SUBCONSULTA CORRELACIONADA (Supervisores usando EXISTS).
+     * GET /api/funcionarios/supervisores-exists
+     */
+    @GetMapping("/supervisores-exists")
+    public List<Funcionario> getSupervisoresPorExists() {
+        return funcionarioService.encontrarSupervisoresPorSubconsultaCorrelacionada();
     }
 }
