@@ -173,3 +173,59 @@ CREATE TABLE Recibo (
     valor_recibo DECIMAL(15, 2) NOT NULL,
     idTransacao INT,
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao));
+
+/* * 1. Índice em Funcionario(idSupervisor):
+ * Justificativa: Essencial para acelerar as consultas de hierarquia
+ * (Anti-Join e Subconsulta Correlacionada) que faremos no
+ * FuncionarioRepository, pois otimiza a auto-referência
+ * (F1.idFuncionario = F2.idSupervisor).
+ */
+CREATE INDEX idx_func_idSupervisor ON Funcionario(idSupervisor);
+
+
+/* * 2. Índice em Transacao(idConta):
+ * Justificativa: Acelera a busca de transações por conta.
+ * Será usado diretamente pela subconsulta no ContaRepository
+ * para encontrar contas com depósitos de alto valor.
+ */
+CREATE INDEX idx_transacao_idConta ON Transacao(idConta);
+
+/*
+Cria um "dossiê" do cliente, unificando dados cadastrais
+ (Cliente), telefone (Telefone) e identificação fiscal (PessoaFisica / PessoaJuridica).
+  Essencial para telas de CRM.
+*/
+
+CREATE VIEW vw_RelatorioClienteDetalhado AS
+SELECT
+    C.id_Cliente,
+    C.nome,
+    C.rua,
+    C.CEP,
+    T.Numero AS telefone_contato,
+    PF.cpf,
+    PJ.cnpj
+FROM
+    Cliente C
+LEFT JOIN Telefone T ON C.id_Cliente = T.id_Cliente
+LEFT JOIN PessoaFisica PF ON C.id_Cliente = PF.id_Cliente
+LEFT JOIN PessoaJuridica PJ ON C.id_Cliente = PJ.id_Cliente;
+
+/*oltada para "Análise de Risco". Consolida a posição financeira (Conta),
+ serviços (Servico) e contratos (Contrato) de um cliente.*/
+
+CREATE VIEW vw_PosicaoFinanceiraServicos AS
+SELECT
+    C.id_Cliente,
+    C.nome AS nome_cliente,
+    K.idConta,
+    K.saldo,
+    S.idServico,
+    S.descricao_servico,
+    CT.idContrato,
+    CT.valor_total AS valor_contrato
+FROM
+    Cliente C
+LEFT JOIN Conta K ON C.id_Cliente = K.id_Cliente
+LEFT JOIN Servico S ON C.id_Cliente = S.id_Cliente
+LEFT JOIN Contrato CT ON S.idServico = CT.idServico;

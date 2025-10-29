@@ -1,6 +1,11 @@
 package br.projeto.bd.repository;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import br.projeto.bd.dto.AuditoriaContaTransacaoDTO;
 import br.projeto.bd.dto.ParContasAgenciaDTO;
 import br.projeto.bd.entity.Conta;
 
@@ -125,5 +131,88 @@ public class ContaRepository {
     public List<Conta> findBySaldoBetweenOrderBySaldoDesc(BigDecimal saldoMin, BigDecimal saldoMax) {
         String sql = "SELECT * FROM Conta WHERE saldo BETWEEN ? AND ? ORDER BY saldo DESC";
         return jdbcTemplate.query(sql, new Object[]{saldoMin, saldoMax}, rowMapper);
+    }
+
+    /**
+     * CONSULTA 3: SUBCONSULTA (com IN e JOIN)
+     * Objetivo: Encontrar todas as Contas que realizaram um depósito
+     * acima de um valor X.
+     */
+    public List<Conta> findContasComDepositosAcimaDe(Connection conn, BigDecimal valorMinimo) {
+        List<Conta> contas = new ArrayList<>();
+        
+        // A subconsulta interna junta Transacao e Deposito para
+        // encontrar os 'idConta' elegíveis.
+        String sql = """
+            SELECT idConta, agencia, numero, saldo, id_Cliente
+            FROM Conta
+            WHERE idConta IN (
+                SELECT T.idConta
+                FROM Transacao T
+                JOIN Deposito D ON T.idTransacao = D.idTransacao
+                WHERE D.valor_deposito > ?
+            )
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setBigDecimal(1, valorMinimo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Conta c = new Conta(); // Supondo que você tenha um construtor
+                    c.setIdConta(rs.getInt("idConta"));
+                    c.setAgencia(rs.getString("agencia"));
+                    c.setNumero(rs.getString("numero"));
+                    c.setSaldo(rs.getBigDecimal("saldo"));
+                    c.setid_Cliente(rs.getInt("id_Cliente"));
+                    contas.add(c);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return contas;
+    }
+
+    /**
+     * CONSULTA 4: FULL OUTER JOIN
+     * Objetivo: Criar um relatório de auditoria que mostre:
+     * 1. Contas com suas transações.
+     * 2. Contas que NUNCA tiveram transações (saldo inicial, por ex.)
+     * 3. Transações "órfãs" (se a FK idConta puder ser NULL).
+     */
+    public List<AuditoriaContaTransacaoDTO> getRelatorioAuditoriaContasTransacoes(Connection conn) {
+        List<AuditoriaContaTransacaoDTO> relatorio = new ArrayList<>();
+        
+        // FULL OUTER JOIN mostra todos os registros de AMBAS as tabelas,
+        // combinando onde a condição (ON) é verdadeira.
+        String sql = """
+            SELECT 
+                C.idConta, C.agencia, C.numero,
+                T.idTransacao, T.dataHora
+            FROM Conta C
+            FULL OUTER JOIN Transacao T ON C.idConta = T.idConta
+            ORDER BY C.idConta, T.dataHora
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                AuditoriaContaTransacaoDTO item = new AuditoriaContaTransacaoDTO();
+                // Usamos getInt() e getTimestamp() que retornam 0 ou null
+                // se o valor for SQL NULL
+                item.setIdConta((Integer) rs.getObject("idConta")); 
+                item.setAgencia(rs.getString("agencia"));
+                item.setNumeroConta(rs.getString("numero"));
+                item.setIdTransacao((Integer) rs.getObject("idTransacao"));
+                item.setDataHoraTransacao(rs.getTimestamp("dataHora"));
+                relatorio.add(item);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return relatorio;
     }
 }

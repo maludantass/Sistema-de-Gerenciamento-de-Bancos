@@ -1,5 +1,10 @@
 package br.projeto.bd.repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -123,5 +128,72 @@ public class FuncionarioRepository {
         
         // Reutilizamos o RowMapper original, pois o resultado é uma lista de Funcionarios.
         return jdbcTemplate.query(sql, rowMapper);
+    }
+
+    /**
+     * CONSULTA 1: ANTI JOIN (LEFT JOIN ... IS NULL)
+     * Objetivo: Encontrar todos os funcionários que NÃO são supervisores de ninguém.
+     */
+    public List<Funcionario> findFuncionariosQueNaoSaoSupervisores(Connection conn) {
+        List<Funcionario> funcionarios = new ArrayList<>();
+        
+        // Este é um Anti Join. Estamos procurando funcionários (F1)
+        // que não aparecem na coluna 'idSupervisor' de nenhum outro funcionário (F2).
+        String sql = """
+            SELECT F1.idFuncionario, F1.nome, F1.funcao
+            FROM Funcionario F1
+            LEFT JOIN Funcionario F2 ON F1.idFuncionario = F2.idSupervisor
+            WHERE F2.idFuncionario IS NULL
+            """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Funcionario f = new Funcionario(); // Supondo que você tenha um construtor
+                f.setIdFuncionario(rs.getInt("idFuncionario"));
+                f.setNome(rs.getString("nome"));
+                f.setFuncao(rs.getString("funcao"));
+                funcionarios.add(f);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Trate a exceção adequadamente
+        }
+        return funcionarios;
+    }
+
+    /**
+     * CONSULTA 2: SUBCONSULTA CORRELACIONADA (com EXISTS)
+     * Objetivo: Encontrar todos os funcionários que SÃO supervisores.
+     */
+    public List<Funcionario> findAllSupervisores(Connection conn) {
+        List<Funcionario> supervisores = new ArrayList<>();
+        
+        // Subconsulta correlacionada: Para CADA linha F1,
+        // o EXISTS verifica se existe algum F2 que tenha F1 como supervisor.
+        String sql = """
+            SELECT F1.idFuncionario, F1.nome, F1.funcao
+            FROM Funcionario F1
+            WHERE EXISTS (
+                SELECT 1
+                FROM Funcionario F2
+                WHERE F2.idSupervisor = F1.idFuncionario
+            )
+            """;
+            
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Funcionario f = new Funcionario();
+                f.setIdFuncionario(rs.getInt("idFuncionario"));
+                f.setNome(rs.getString("nome"));
+                f.setFuncao(rs.getString("funcao"));
+                supervisores.add(f);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); 
+        }
+        return supervisores;
     }
 }

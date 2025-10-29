@@ -1,0 +1,48 @@
+package br.projeto.bd.entity;
+
+import java.math.BigDecimal;
+
+public class Deposito {
+
+    private Integer idTransacao; // Esta é PK e FK
+    private String origemValor;
+    private String metodoDeposito;
+    private BigDecimal valorDeposito;
+
+    // Construtor, Getters e Setters
+
+    public Deposito() {
+    }
+
+    public Integer getIdTransacao() {
+        return idTransacao;
+    }
+
+    public void setIdTransacao(Integer idTransacao) {
+        this.idTransacao = idTransacao;
+    }
+
+    public String getOrigemValor() {
+        return origemValor;
+    }
+
+    public void setOrigemValor(String origemValor) {
+        this.origemValor = origemValor;
+    }
+
+    public String getMetodoDeposito() {
+        return metodoDeposito;
+    }
+
+    public void setMetodoDeposito(String metodoDeposito) {
+        this.metodoDeposito = metodoDeposito;
+    }
+
+    public BigDecimal getValorDeposito() {
+        return valorDeposito;
+    }
+
+    public void setValorDeposito(BigDecimal valorDeposito) {
+        this.valorDeposito = valorDeposito;
+    }
+}
