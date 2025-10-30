@@ -180,7 +180,8 @@ CREATE TABLE Recibo (
  * FuncionarioRepository, pois otimiza a auto-referência
  * (F1.idFuncionario = F2.idSupervisor).
  */
-CREATE INDEX idx_func_idSupervisor ON Funcionario(idSupervisor);
+ 
+CREATE INDEX idx_func_nome ON Funcionario(nome);
 
 
 /* * 2. Índice em Transacao(idConta):
@@ -188,7 +189,7 @@ CREATE INDEX idx_func_idSupervisor ON Funcionario(idSupervisor);
  * Será usado diretamente pela subconsulta no ContaRepository
  * para encontrar contas com depósitos de alto valor.
  */
-CREATE INDEX idx_transacao_idConta ON Transacao(idConta);
+CREATE INDEX idx_transacao_saldo ON Transacao(saldo);
 
 /*
 Cria um "dossiê" do cliente, unificando dados cadastrais
