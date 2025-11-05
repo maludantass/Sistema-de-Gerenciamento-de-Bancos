@@ -230,3 +230,70 @@ FROM
 LEFT JOIN Conta K ON C.id_Cliente = K.id_Cliente
 LEFT JOIN Servico S ON C.id_Cliente = S.id_Cliente
 LEFT JOIN Contrato CT ON S.idServico = CT.idServico;
+
+/*1 função*/
+/*v = valor*/
+DELIMITER $$
+
+CREATE FUNCTION classifica_risco_cliente(p_id INT)
+RETURNS VARCHAR(10)
+BEGIN
+    DECLARE v_total_saldo DECIMAL(18,2);
+    DECLARE v_total_contrato DECIMAL(18,2);
+    DECLARE v_risco DECIMAL(18,4);
+
+    SELECT COALESCE(SUM(saldo), 0)
+      INTO v_total_saldo
+      FROM Conta
+     WHERE id_Cliente = p_id;
+
+    SELECT COALESCE(SUM(CT.valor_total), 0)
+      INTO v_total_contrato
+      FROM Servico S
+      JOIN Contrato CT ON CT.idServico = S.idServico
+     WHERE S.id_Cliente = p_id;
+
+    IF v_total_contrato = 0 THEN
+        RETURN 'BAIXO';
+    END IF;
+
+    SET v_risco = v_total_saldo / v_total_contrato;
+
+    IF v_risco >= 1.0 THEN
+        RETURN 'BAIXO';
+    ELSEIF v_risco >= 0.5 THEN
+        RETURN 'MEDIO';
+    ELSE
+        RETURN 'ALTO';
+    END IF;
+END $$
+DELIMITER ;
+
+/*2 função*/
+/*v = valor*/
+DELIMITER $$
+
+CREATE FUNCTION tipo_cliente(p_id INT)
+RETURNS VARCHAR(20)
+BEGIN
+    DECLARE v_pf INT DEFAULT 0;
+    DECLARE v_pj INT DEFAULT 0;
+    DECLARE v_tipo VARCHAR(20);
+
+    SELECT COUNT(*) INTO v_pf
+      FROM PessoaFisica
+     WHERE id_Cliente = p_id;
+
+    SELECT COUNT(*) INTO v_pj
+      FROM PessoaJuridica
+     WHERE id_Cliente = p_id;
+
+    CASE
+        WHEN v_pf > 0 THEN SET v_tipo = 'PESSOA FISICA';
+        WHEN v_pj > 0 THEN SET v_tipo = 'PESSOA JURIDICA';
+        ELSE SET v_tipo = 'NAO INFORMADO';
+    END CASE;
+
+    RETURN v_tipo;
+END $$
+DELIMITER ;
