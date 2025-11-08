@@ -212,7 +212,7 @@ LEFT JOIN Telefone T ON C.id_Cliente = T.id_Cliente
 LEFT JOIN PessoaFisica PF ON C.id_Cliente = PF.id_Cliente
 LEFT JOIN PessoaJuridica PJ ON C.id_Cliente = PJ.id_Cliente;
 
-/*oltada para "Análise de Risco". Consolida a posição financeira (Conta),
+/*voltada para "Análise de Risco". Consolida a posição financeira (Conta),
  serviços (Servico) e contratos (Contrato) de um cliente.*/
 
 CREATE VIEW vw_PosicaoFinanceiraServicos AS
@@ -231,15 +231,15 @@ LEFT JOIN Conta K ON C.id_Cliente = K.id_Cliente
 LEFT JOIN Servico S ON C.id_Cliente = S.id_Cliente
 LEFT JOIN Contrato CT ON S.idServico = CT.idServico;
 
-/*1 função*/
-/*v = valor*/
+/*primeira função*/
 DELIMITER $$
 
 CREATE FUNCTION classifica_risco_cliente(p_id INT)
 RETURNS VARCHAR(10)
+READS SQL DATA
 BEGIN
-    DECLARE v_total_saldo DECIMAL(18,2);
-    DECLARE v_total_contrato DECIMAL(18,2);
+    DECLARE v_total_saldo DECIMAL(18,2) DEFAULT 0;
+    DECLARE v_total_contrato DECIMAL(18,2) DEFAULT 0;
     DECLARE v_risco DECIMAL(18,4);
 
     SELECT COALESCE(SUM(saldo), 0)
@@ -269,12 +269,12 @@ BEGIN
 END $$
 DELIMITER ;
 
-/*2 função*/
-/*v = valor*/
+/*segunda função*/
 DELIMITER $$
 
 CREATE FUNCTION tipo_cliente(p_id INT)
 RETURNS VARCHAR(20)
+READS SQL DATA
 BEGIN
     DECLARE v_pf INT DEFAULT 0;
     DECLARE v_pj INT DEFAULT 0;
@@ -297,7 +297,6 @@ BEGIN
     RETURN v_tipo;
 END $$
 DELIMITER ;
-
 
 /*primeiro procedimento*/
 DELIMITER $$
@@ -326,8 +325,7 @@ END$$
 
 DELIMITER ;
 
-
-/* segundo procedure*/
+/* segundo procedimento*/
 DELIMITER $$
 
 CREATE PROCEDURE processa_juros_emprestimo()
