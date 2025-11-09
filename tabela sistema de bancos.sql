@@ -330,7 +330,7 @@ DELIMITER $$
 
 CREATE PROCEDURE processa_juros_emprestimo()
 BEGIN
-    DECLARE done INT DEFAULT FALSE;
+    DECLARE done TINYINT DEFAULT 0;
     DECLARE v_idServico INT;
     DECLARE v_valor_solicitado DECIMAL(15, 2);
     DECLARE v_taxa_juros DECIMAL(5, 4);
@@ -340,12 +340,12 @@ BEGIN
     -- 1. DECLARE: Cursor para buscar os dados necessários para o cálculo
     DECLARE cur_emprestimos CURSOR FOR
         SELECT E.idServico, E.valor_solicitado, S.taxa_juros, S.id_Cliente
-        FROM Emprestimo E
-        JOIN Servico S ON E.idServico = S.idServico
-        WHERE E.valor_solicitado > 0; -- Apenas empréstimos ainda ativos (com valor pendente)
+          FROM Emprestimo E
+          JOIN Servico S ON E.idServico = S.idServico
+         WHERE E.valor_solicitado > 0; -- Apenas empréstimos ainda ativos (com valor pendente)
         
     -- Tratamento de erro/fim de dados (para sair do loop)
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
 
     OPEN cur_emprestimos;
 
@@ -354,27 +354,28 @@ BEGIN
         -- FETCH: Lê os dados da linha atual para as variáveis
         FETCH cur_emprestimos INTO v_idServico, v_valor_solicitado, v_taxa_juros, v_id_cliente;
         
-        IF done THEN
+        IF done = 1 THEN
             LEAVE read_loop;
         END IF;
 
         -- ******* LÓGICA QUE EXIGE CURSOR *******
         
         -- 1. CÁLCULO: Calcula o valor do juros (e arredonda para 2 casas)
-        SET v_juros_mensal = ROUND(v_valor_solicitado * v_taxa_juros, 2);
+        SET v_juros_mensal = ROUND(v_valor_solicitado * IFNULL(v_taxa_juros, 0), 2);
 
         -- 2. ATUALIZAÇÃO DO EMPRÉSTIMO (Subtrai o juros do valor principal)
         -- Processamento sequencial, linha a linha
         UPDATE Emprestimo
-        SET valor_solicitado = valor_solicitado - v_juros_mensal
-        WHERE idServico = v_idServico;
+           SET valor_solicitado = GREATEST(0, valor_solicitado - v_juros_mensal)
+         WHERE idServico = v_idServico;
 
         -- 3. CRÉDITO NA CONTA DO CLIENTE (Adiciona o valor do juros como 'renda' na primeira conta do cliente)
         -- Complexidade adicional: precisa garantir que apenas UMA conta é atualizada
         UPDATE Conta
-        SET saldo = saldo + v_juros_mensal
-        WHERE id_Cliente = v_id_cliente
-        LIMIT 1; 
+           SET saldo = saldo + v_juros_mensal
+         WHERE id_Cliente = v_id_cliente
+         ORDER BY idConta
+         LIMIT 1; 
 
         -- Note: Se fosse um 'UPDATE' baseado em SET-BASED, o cálculo e a atualização
         -- sequencial entre Emprestimo e Conta seria extremamente difícil de garantir
@@ -383,9 +384,7 @@ BEGIN
     END LOOP;
 
     CLOSE cur_emprestimos;
-    DEALLOCATE cur_emprestimos;
     
     SELECT 'Processamento de juros de empréstimos concluído.' AS Status;
 END $$
-
 DELIMITER ;
