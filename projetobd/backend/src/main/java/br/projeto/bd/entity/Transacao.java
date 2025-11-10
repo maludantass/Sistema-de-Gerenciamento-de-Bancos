@@ -1,6 +1,6 @@
 package br.projeto.bd.entity;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 public class Transacao {
     private Integer idTransacao;

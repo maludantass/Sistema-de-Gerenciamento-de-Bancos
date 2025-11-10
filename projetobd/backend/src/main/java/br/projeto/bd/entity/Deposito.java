@@ -2,8 +2,16 @@ package br.projeto.bd.entity;
 
 import java.math.BigDecimal;
 
-public class Deposito {
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "Deposito")
+public class Deposito extends Transacao {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idTransacao; // Esta é PK e FK
     private String origemValor;
     private String metodoDeposito;
