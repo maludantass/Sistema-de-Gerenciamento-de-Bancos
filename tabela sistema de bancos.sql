@@ -174,6 +174,14 @@ CREATE TABLE Recibo (
     idTransacao INT,
     FOREIGN KEY (idTransacao) REFERENCES Transacao(idTransacao));
 
+CREATE TABLE Log_Transacoes (
+    idLog INT AUTO_INCREMENT PRIMARY KEY,
+    idTransacao INT,
+    idConta INT,
+    tipo_transacao VARCHAR(50),
+    valor DECIMAL(15, 2),
+    data_registro DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 /* * 1. Índice em Funcionario(idSupervisor):
  * Justificativa: Essencial para acelerar as consultas de hierarquia
  * (Anti-Join e Subconsulta Correlacionada) que faremos no
@@ -189,7 +197,7 @@ CREATE INDEX idx_func_nome ON Funcionario(nome);
  * Será usado diretamente pela subconsulta no ContaRepository
  * para encontrar contas com depósitos de alto valor.
  */
-CREATE INDEX idx_transacao_saldo ON Transacao(saldo);
+CREATE INDEX idx_conta_saldo ON Conta(saldo);
 
 /*
 Cria um "dossiê" do cliente, unificando dados cadastrais
@@ -387,4 +395,54 @@ BEGIN
     
     SELECT 'Processamento de juros de empréstimos concluído.' AS Status;
 END $$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER after_insert_saque
+AFTER INSERT
+ON Saque
+FOR EACH ROW
+BEGIN
+	DECLARE conta_id INT;  
+    -- Busca a conta relacionada à transação
+    SELECT idConta INTO conta_id
+    FROM Transacao
+    WHERE idTransacao = NEW.idTransacao;
+
+    -- Atualiza o saldo (débito)
+    UPDATE Conta
+    SET saldo = saldo - NEW.valor_saque
+    WHERE idConta = conta_id;
+
+    -- Registra o log da transação
+    INSERT INTO Log_Transacoes (idTransacao, idConta, tipo_transacao, valor)
+    VALUES (NEW.idTransacao, conta_id, 'SAQUE', NEW.valor_saque);
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER after_insert_deposito
+AFTER INSERT
+ON Deposito
+FOR EACH ROW
+BEGIN
+    DECLARE conta_id INT;
+
+    -- Busca a conta relacionada à transação
+    SELECT idConta INTO conta_id
+    FROM Transacao
+    WHERE idTransacao = NEW.idTransacao;
+
+    -- Atualiza o saldo (crédito)
+    UPDATE Conta
+    SET saldo = saldo + NEW.valor_deposito
+    WHERE idConta = conta_id;
+
+    -- Registra o log da transação
+    INSERT INTO Log_Transacoes (idTransacao, idConta, tipo_transacao, valor)
+    VALUES (NEW.idTransacao, conta_id, 'DEPOSITO', NEW.valor_deposito);
+END$$
+
 DELIMITER ;
