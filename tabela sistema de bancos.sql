@@ -396,31 +396,45 @@ BEGIN
     SELECT 'Processamento de juros de empréstimos concluído.' AS Status;
 END $$
 DELIMITER ;
-
+-- --------------------------------------------------------------
+-- TRIGGER: after_insert_saque
+-- Objetivo: Atualizar o saldo da conta e registrar um log
+-- automaticamente após a inserção de um novo saque.
+-- --------------------------------------------------------------
 DELIMITER $$
+
 CREATE TRIGGER after_insert_saque
 AFTER INSERT
 ON Saque
 FOR EACH ROW
 BEGIN
+    -- Declara uma variável local para armazenar o ID da conta relacionada
 	DECLARE conta_id INT;  
-    -- Busca a conta relacionada à transação
+
+    -- Busca o ID da conta a partir da tabela Transacao
+    -- usando o idTransacao do novo saque inserido
     SELECT idConta INTO conta_id
     FROM Transacao
     WHERE idTransacao = NEW.idTransacao;
 
-    -- Atualiza o saldo (débito)
+    -- Atualiza o saldo da conta, subtraindo o valor do saque
     UPDATE Conta
     SET saldo = saldo - NEW.valor_saque
     WHERE idConta = conta_id;
 
-    -- Registra o log da transação
+    -- Insere um registro na tabela de logs
+    -- indicando que foi realizado um SAQUE e seu valor
     INSERT INTO Log_Transacoes (idTransacao, idConta, tipo_transacao, valor)
     VALUES (NEW.idTransacao, conta_id, 'SAQUE', NEW.valor_saque);
 END$$
 
 DELIMITER ;
 
+-- --------------------------------------------------------------
+-- TRIGGER: after_insert_deposito
+-- Objetivo: Atualizar o saldo da conta e registrar um log
+-- automaticamente após a inserção de um novo depósito.
+-- --------------------------------------------------------------
 DELIMITER $$
 
 CREATE TRIGGER after_insert_deposito
@@ -428,21 +442,25 @@ AFTER INSERT
 ON Deposito
 FOR EACH ROW
 BEGIN
+    -- Declara uma variável local para armazenar o ID da conta relacionada
     DECLARE conta_id INT;
 
-    -- Busca a conta relacionada à transação
+    -- Busca o ID da conta a partir da tabela Transacao
+    -- usando o idTransacao do novo depósito inserido
     SELECT idConta INTO conta_id
     FROM Transacao
     WHERE idTransacao = NEW.idTransacao;
 
-    -- Atualiza o saldo (crédito)
+    -- Atualiza o saldo da conta, somando o valor do depósito
     UPDATE Conta
     SET saldo = saldo + NEW.valor_deposito
     WHERE idConta = conta_id;
 
-    -- Registra o log da transação
+    -- Insere um registro na tabela de logs
+    -- indicando que foi realizado um DEPÓSITO e seu valor
     INSERT INTO Log_Transacoes (idTransacao, idConta, tipo_transacao, valor)
     VALUES (NEW.idTransacao, conta_id, 'DEPOSITO', NEW.valor_deposito);
 END$$
 
 DELIMITER ;
+
