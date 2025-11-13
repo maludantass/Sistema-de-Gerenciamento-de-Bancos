@@ -2,6 +2,7 @@ package br.projeto.bd.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,14 @@ public class DepositoRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty(); // Retorna vazio se não encontrar
         }
+    }
+
+    public List<Deposito> findAll() {
+        final String sql = "SELECT t.idTransacao, t.dataHora, t.idConta, " +
+                           "d.origem_valor, d.metodo_deposito, d.valor_deposito " +
+                           "FROM Transacao t " +
+                           "JOIN Deposito d ON t.idTransacao = d.idTransacao";
+        return jdbcTemplate.query(sql, new DepositoRowMapper());
     }
 
     /**

@@ -1,14 +1,16 @@
 package br.projeto.bd.service;
 
-import br.projeto.bd.dto.DepositoRequestDTO;
-import br.projeto.bd.entity.Deposito;
-import br.projeto.bd.repository.DepositoRepository;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.NoSuchElementException;
+import br.projeto.bd.dto.DepositoRequestDTO;
+import br.projeto.bd.entity.Deposito;
+import br.projeto.bd.repository.DepositoRepository;
 
 @Service
 public class DepositoService {
@@ -28,6 +30,9 @@ public class DepositoService {
         return depositoRepository.salvar(deposito);
     }
 
+    public List<Deposito> listarTodosDepositos() {
+        return depositoRepository.findAll();
+    }
     /**
      * READ (GET)
      */

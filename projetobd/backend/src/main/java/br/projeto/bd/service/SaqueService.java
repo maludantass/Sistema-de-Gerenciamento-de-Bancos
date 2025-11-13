@@ -1,15 +1,16 @@
 package br.projeto.bd.service;
 
-import br.projeto.bd.dto.SaqueRequestDTO;
-import br.projeto.bd.entity.Saque;
-import br.projeto.bd.repository.SaqueRepository;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.NoSuchElementException;
+import br.projeto.bd.dto.SaqueRequestDTO;
+import br.projeto.bd.entity.Saque;
+import br.projeto.bd.repository.SaqueRepository;
 
 @Service
 public class SaqueService {
@@ -30,6 +31,10 @@ public class SaqueService {
         return saqueRepository.salvar(saque);
     }
 
+    @Transactional(readOnly = true)
+    public List<Saque> listarTodosSaques() {
+        return saqueRepository.findAll();
+    }
     /**
      * READ
      * Busca um Saque pelo ID.

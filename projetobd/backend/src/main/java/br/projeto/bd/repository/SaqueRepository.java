@@ -2,6 +2,7 @@ package br.projeto.bd.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class SaqueRepository {
      */
     public Saque salvar(Saque saque) {
         // Etapa 1: Inserir na tabela pai (Transacao)
+        // O idConta está aqui, como esperado.
         final String sqlTransacao = "INSERT INTO Transacao (idTransacao, dataHora, idConta) VALUES (?, ?, ?)";
         jdbcTemplate.update(
                 sqlTransacao,
@@ -33,6 +35,7 @@ public class SaqueRepository {
         );
 
         // Etapa 2: Inserir na tabela filha (Saque)
+        // (Corretamente, não há idConta aqui)
         final String sqlSaque = "INSERT INTO Saque (idTransacao, tipo_saque, limite_utilizado, valor_saque) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(
                 sqlSaque,
@@ -60,6 +63,18 @@ public class SaqueRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty(); // Retorna vazio se não encontrar
         }
+    }
+
+    public List<Saque> findAll() {
+        final String sql = "SELECT t.idTransacao, t.dataHora, t.idConta, " +
+                           "s.tipo_saque, s.limite_utilizado, s.valor_saque " +
+                           "FROM Transacao t " +
+                           "JOIN Saque s ON t.idTransacao = s.idTransacao";
+        
+        // Se precisar de ordenação (cuidado com performance sem índice):
+        // final String sql = "... JOIN ... ORDER BY t.dataHora DESC";
+                           
+        return jdbcTemplate.query(sql, new SaqueRowMapper());
     }
 
     /**

@@ -2,15 +2,21 @@ package br.projeto.bd.entity;
 
 import java.sql.Timestamp;
 
-public class Transacao {
+/**
+ * Classe base (abstrata) para Transacoes.
+ * Esta é a classe que Saque e Deposito herdam.
+ */
+public abstract class Transacao {
+
     private Integer idTransacao;
     private Timestamp dataHora;
     private Integer idConta;
 
-    // Construtor, Getters e Setters
-
+    // Construtor vazio
     public Transacao() {
     }
+
+    // Getters e Setters
 
     public Integer getIdTransacao() {
         return idTransacao;

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "Saque")
 public class Saque extends Transacao {
-     @Id
+    @Id
     @Column(name = "idTransacao")
     private Integer idTransacao;
 

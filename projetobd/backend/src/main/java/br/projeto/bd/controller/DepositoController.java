@@ -1,4 +1,5 @@
 package br.projeto.bd.controller;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -53,7 +54,15 @@ public class DepositoController {
             return new ResponseEntity<>("Erro interno do servidor: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); // 500
         }
     }
-
+    @GetMapping
+    public ResponseEntity<?> listarTodosDepositos() {
+        try {
+            List<Deposito> depositos = depositoService.listarTodosDepositos();
+            return ResponseEntity.ok(depositos);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro interno: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     /**
      * GET: Busca um Deposito pelo ID.
      */
