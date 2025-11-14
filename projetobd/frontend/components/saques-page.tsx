@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,9 +10,10 @@ import { ArrowUpCircle } from "lucide-react"
 
 interface Saque {
   idTransacao: number
-  valor: number
-  data_transacao: string
+  valorSaque: number
+  dataHora: string
   idConta: number
+  tipoSaque: string
 }
 
 export function SaquesPage() {
@@ -21,12 +21,12 @@ export function SaquesPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingSaque, setEditingSaque] = useState<Saque | null>(null)
-
   const [formData, setFormData] = useState({
     idTransacao: 0,
-    valor: 0,
-    data_transacao: "",
+    valorSaque: 0,
+    dataHora: "",
     idConta: 0,
+    tipoSaque: "",
   })
 
   useEffect(() => {
@@ -38,7 +38,6 @@ export function SaquesPage() {
       console.log("[v0] Buscando saques...")
       const response = await fetch("http://localhost:8080/api/saques")
       console.log("[v0] Status da resposta:", response.status)
-
       if (response.ok) {
         const data = await response.json()
         console.log("[v0] Saques recebidos:", data)
@@ -58,13 +57,15 @@ export function SaquesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const dataFormatada = formData.data_transacao.replace("T", " ") + ":00"
+    // Converte datetime-local (2024-10-25T14:30) para o formato esperado (2024-10-25 14:30:00)
+    const dataFormatada = formData.dataHora.replace("T", " ") + ":00"
 
     const payload = {
       idTransacao: formData.idTransacao,
-      valor: formData.valor,
-      data_transacao: dataFormatada,
       idConta: formData.idConta,
+      dataHora: dataFormatada,
+      tipoSaque: formData.tipoSaque,
+      valorSaque: formData.valorSaque,
     }
 
     console.log("[v0] Enviando payload:", payload)
@@ -73,7 +74,6 @@ export function SaquesPage() {
       const url = editingSaque
         ? `http://localhost:8080/api/saques/${editingSaque.idTransacao}`
         : "http://localhost:8080/api/saques"
-
       const method = editingSaque ? "PUT" : "POST"
 
       const response = await fetch(url, {
@@ -123,9 +123,10 @@ export function SaquesPage() {
   const resetForm = () => {
     setFormData({
       idTransacao: 0,
-      valor: 0,
-      data_transacao: "",
+      valorSaque: 0,
+      dataHora: "",
       idConta: 0,
+      tipoSaque: "",
     })
     setEditingSaque(null)
     setShowForm(false)
@@ -133,10 +134,11 @@ export function SaquesPage() {
 
   const openEditForm = (saque: Saque) => {
     setEditingSaque(saque)
-    const dataLocal = saque.data_transacao.replace(" ", "T").substring(0, 16)
+    // Converte "2024-10-25 14:30:00" para "2024-10-25T14:30" (formato datetime-local)
+    const dataLocal = saque.dataHora.substring(0, 16).replace(" ", "T")
     setFormData({
       ...saque,
-      data_transacao: dataLocal,
+      dataHora: dataLocal,
     })
     setShowForm(true)
   }
@@ -209,28 +211,31 @@ export function SaquesPage() {
                     disabled={!!editingSaque}
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="valor">Valor *</Label>
+                  <Label htmlFor="valorSaque">Valor do Saque *</Label>
                   <Input
-                    id="valor"
+                    id="valorSaque"
                     type="number"
                     step="0.01"
-                    value={formData.valor}
-                    onChange={(e) => setFormData({ ...formData, valor: Number.parseFloat(e.target.value) || 0 })}
+                    value={formData.valorSaque}
+                    onChange={(e) => setFormData({ ...formData, valorSaque: Number.parseFloat(e.target.value) || 0 })}
                     required
                     min="0.01"
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="data_transacao">Data da Transação *</Label>
+                  <Label htmlFor="dataHora">Data e Hora *</Label>
                   <Input
-                    id="data_transacao"
+                    id="dataHora"
                     type="datetime-local"
-                    value={formData.data_transacao}
-                    onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
+                    value={formData.dataHora}
+                    onChange={(e) => setFormData({ ...formData, dataHora: e.target.value })}
                     required
                   />
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="idConta">ID da Conta *</Label>
                   <Input
@@ -243,7 +248,20 @@ export function SaquesPage() {
                   />
                   <p className="text-xs text-muted-foreground">A conta deve existir no sistema</p>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tipoSaque">Tipo de Saque *</Label>
+                  <Input
+                    id="tipoSaque"
+                    type="text"
+                    value={formData.tipoSaque}
+                    onChange={(e) => setFormData({ ...formData, tipoSaque: e.target.value })}
+                    required
+                    placeholder="Ex: Caixa eletrônico, Agência, etc."
+                  />
+                </div>
               </div>
+
               <div className="flex gap-3 pt-4">
                 <Button type="submit" className="bg-red-600 hover:bg-red-700 px-8">
                   {editingSaque ? "Atualizar" : "Criar"}
@@ -266,6 +284,7 @@ export function SaquesPage() {
                 <th className="p-4 text-left text-sm font-semibold">Valor</th>
                 <th className="p-4 text-left text-sm font-semibold">Data</th>
                 <th className="p-4 text-left text-sm font-semibold">ID Conta</th>
+                <th className="p-4 text-left text-sm font-semibold">Tipo</th>
                 <th className="p-4 text-left text-sm font-semibold">Ações</th>
               </tr>
             </thead>
@@ -283,13 +302,11 @@ export function SaquesPage() {
                     </span>
                   </td>
                   <td className="p-4 font-semibold text-red-600">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(saque.valor)}
+                    {formatCurrency(saque.valorSaque)}
                   </td>
-                  <td className="p-4 text-sm">{saque.data_transacao}</td>
+                  <td className="p-4 text-sm">{formatDate(saque.dataHora)}</td>
                   <td className="p-4">{saque.idConta}</td>
+                  <td className="p-4 text-sm">{saque.tipoSaque}</td>
                   <td className="p-4">
                     <div className="flex gap-2">
                       <Button
@@ -314,7 +331,6 @@ export function SaquesPage() {
               ))}
             </tbody>
           </table>
-
           {saques.length === 0 && !loading && (
             <div className="p-12 text-center">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -322,7 +338,7 @@ export function SaquesPage() {
               </div>
               <h3 className="text-lg font-semibold mb-2">Nenhum saque encontrado</h3>
               <p className="text-muted-foreground mb-4">
-                Comece adicionando o primeiro saque ou verifique se o backend está rodando
+                Comece a primeiro saque ou verifique se o backend está rodando
               </p>
               <Button onClick={() => setShowForm(true)} className="bg-red-600 hover:bg-red-700">
                 + Adicionar Saque

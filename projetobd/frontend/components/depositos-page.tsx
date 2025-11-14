@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,9 +10,10 @@ import { ArrowDownCircle } from "lucide-react"
 
 interface Deposito {
   idTransacao: number
-  valor: number
-  data_transacao: string
+  valorDeposito: number
+  dataHora: string
   idConta: number
+  metodoDeposito: string
 }
 
 export function DepositosPage() {
@@ -21,12 +21,13 @@ export function DepositosPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingDeposito, setEditingDeposito] = useState<Deposito | null>(null)
-
   const [formData, setFormData] = useState({
     idTransacao: 0,
-    valor: 0,
-    data_transacao: "",
+    valorDeposito: 0,
+    dataHora: "",
     idConta: 0,
+    origemValor: "",
+    metodoDeposito: "",
   })
 
   useEffect(() => {
@@ -38,7 +39,6 @@ export function DepositosPage() {
       console.log("[v0] Buscando depósitos...")
       const response = await fetch("http://localhost:8080/api/depositos")
       console.log("[v0] Status da resposta:", response.status)
-
       if (response.ok) {
         const data = await response.json()
         console.log("[v0] Depósitos recebidos:", data)
@@ -58,13 +58,16 @@ export function DepositosPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const dataFormatada = formData.data_transacao.replace("T", " ") + ":00"
+    // Converte datetime-local (2024-10-25T14:30) para o formato esperado (2024-10-25 14:30:00)
+    const dataFormatada = formData.dataHora.replace("T", " ") + ":00"
 
     const payload = {
       idTransacao: formData.idTransacao,
-      valor: formData.valor,
-      data_transacao: dataFormatada,
       idConta: formData.idConta,
+      dataHora: dataFormatada,
+      origemValor: formData.origemValor,
+      metodoDeposito: formData.metodoDeposito,
+      valorDeposito: formData.valorDeposito,
     }
 
     console.log("[v0] Enviando payload:", payload)
@@ -73,7 +76,6 @@ export function DepositosPage() {
       const url = editingDeposito
         ? `http://localhost:8080/api/depositos/${editingDeposito.idTransacao}`
         : "http://localhost:8080/api/depositos"
-
       const method = editingDeposito ? "PUT" : "POST"
 
       const response = await fetch(url, {
@@ -123,9 +125,11 @@ export function DepositosPage() {
   const resetForm = () => {
     setFormData({
       idTransacao: 0,
-      valor: 0,
-      data_transacao: "",
+      valorDeposito: 0,
+      dataHora: "",
       idConta: 0,
+      origemValor: "",
+      metodoDeposito: "",
     })
     setEditingDeposito(null)
     setShowForm(false)
@@ -133,10 +137,11 @@ export function DepositosPage() {
 
   const openEditForm = (deposito: Deposito) => {
     setEditingDeposito(deposito)
-    const dataLocal = deposito.data_transacao.replace(" ", "T").substring(0, 16)
+    // Converte "2024-10-25 14:30:00" para "2024-10-25T14:30" (formato datetime-local)
+    const dataLocal = deposito.dataHora.substring(0, 16).replace(" ", "T")
     setFormData({
       ...deposito,
-      data_transacao: dataLocal,
+      dataHora: dataLocal,
     })
     setShowForm(true)
   }
@@ -212,28 +217,31 @@ export function DepositosPage() {
                     disabled={!!editingDeposito}
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="valor">Valor *</Label>
+                  <Label htmlFor="valorDeposito">Valor do Depósito *</Label>
                   <Input
-                    id="valor"
+                    id="valorDeposito"
                     type="number"
                     step="0.01"
-                    value={formData.valor}
-                    onChange={(e) => setFormData({ ...formData, valor: Number.parseFloat(e.target.value) || 0 })}
+                    value={formData.valorDeposito}
+                    onChange={(e) => setFormData({ ...formData, valorDeposito: Number.parseFloat(e.target.value) || 0 })}
                     required
                     min="0.01"
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="data_transacao">Data da Transação *</Label>
+                  <Label htmlFor="dataHora">Data e Hora *</Label>
                   <Input
-                    id="data_transacao"
+                    id="dataHora"
                     type="datetime-local"
-                    value={formData.data_transacao}
-                    onChange={(e) => setFormData({ ...formData, data_transacao: e.target.value })}
+                    value={formData.dataHora}
+                    onChange={(e) => setFormData({ ...formData, dataHora: e.target.value })}
                     required
                   />
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="idConta">ID da Conta *</Label>
                   <Input
@@ -246,7 +254,32 @@ export function DepositosPage() {
                   />
                   <p className="text-xs text-muted-foreground">A conta deve existir no sistema</p>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="origemValor">Origem do Valor *</Label>
+                  <Input
+                    id="origemValor"
+                    type="text"
+                    value={formData.origemValor}
+                    onChange={(e) => setFormData({ ...formData, origemValor: e.target.value })}
+                    required
+                    placeholder="Ex: Salário, Transferência, etc."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metodoDeposito">Método de Depósito *</Label>
+                  <Input
+                    id="metodoDeposito"
+                    type="text"
+                    value={formData.metodoDeposito}
+                    onChange={(e) => setFormData({ ...formData, metodoDeposito: e.target.value })}
+                    required
+                    placeholder="Ex: PIX, TED, Dinheiro, etc."
+                  />
+                </div>
               </div>
+
               <div className="flex gap-3 pt-4">
                 <Button type="submit" className="bg-green-600 hover:bg-green-700 px-8">
                   {editingDeposito ? "Atualizar" : "Criar"}
@@ -269,6 +302,8 @@ export function DepositosPage() {
                 <th className="p-4 text-left text-sm font-semibold">Valor</th>
                 <th className="p-4 text-left text-sm font-semibold">Data</th>
                 <th className="p-4 text-left text-sm font-semibold">ID Conta</th>
+                <th className="p-4 text-left text-sm font-semibold">Origem</th>
+                <th className="p-4 text-left text-sm font-semibold">Método</th>
                 <th className="p-4 text-left text-sm font-semibold">Ações</th>
               </tr>
             </thead>
@@ -286,13 +321,12 @@ export function DepositosPage() {
                     </span>
                   </td>
                   <td className="p-4 font-semibold text-green-600">
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(deposito.valor)}
+                    {formatCurrency(deposito.valorDeposito)}
                   </td>
-                  <td className="p-4 text-sm">{deposito.data_transacao}</td>
+                  <td className="p-4 text-sm">{formatDate(deposito.dataHora)}</td>
                   <td className="p-4">{deposito.idConta}</td>
+                  <td className="p-4 text-sm">{deposito.origemValor}</td>
+                  <td className="p-4 text-sm">{deposito.metodoDeposito}</td>
                   <td className="p-4">
                     <div className="flex gap-2">
                       <Button
@@ -317,7 +351,6 @@ export function DepositosPage() {
               ))}
             </tbody>
           </table>
-
           {depositos.length === 0 && !loading && (
             <div className="p-12 text-center">
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">

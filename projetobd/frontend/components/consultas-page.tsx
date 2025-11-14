@@ -7,13 +7,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Search, Database, FileText } from "lucide-react"
 
-interface AuditoriaDTO {
-  numeroConta: string
+interface AuditoriaContaTransacaoDTO {
+  idConta: number
   agencia: string
-  saldoConta: number
-  valorTransacao: number
-  dataTransacao: string
-  tipoTransacao: string
+  numeroConta: string
+  idTransacao: number
+  dataHoraTransacao: string
+}
+
+interface ContaDepositoAlto {
+  idConta: number
+  agencia: string
+  numero: string
+  saldo: number
 }
 
 export function ConsultasPage() {
@@ -24,46 +30,80 @@ export function ConsultasPage() {
 
   const executarAuditoria = async () => {
     setLoading(true)
+    console.log("[Consultas] Executando auditoria...")
+
     try {
       const response = await fetch("http://localhost:8080/api/contas/relatorio-auditoria")
+      console.log("[Consultas] Status da resposta:", response.status)
+
       if (response.ok) {
         const data = await response.json()
-        setResultados(data)
+        console.log("[Consultas] Dados recebidos:", data)
+        console.log("[Consultas] Tipo de dados:", Array.isArray(data) ? "Array" : typeof data)
+        console.log("[Consultas] Quantidade de registros:", Array.isArray(data) ? data.length : "N/A")
+
+        setResultados(Array.isArray(data) ? data : [])
         setActiveConsulta("auditoria")
+
+        if (!Array.isArray(data) || data.length === 0) {
+          alert("Nenhum dado retornado pela auditoria.")
+        }
       } else {
-        alert("Erro ao executar auditoria.")
+        const errorText = await response.text()
+        console.error("[Consultas] Erro do servidor:", errorText)
+        alert(`Erro ao executar auditoria: ${response.status} - ${errorText}`)
       }
     } catch (error) {
-      alert("Erro de conexão.")
+      console.error("[Consultas] Erro de conexão:", error)
+      alert("Erro de conexão. Verifique se o backend está rodando em http://localhost:8080")
     } finally {
       setLoading(false)
     }
   }
 
   const buscarDepositosAltos = async () => {
-    if (!valorMinimo) {
-      alert("Por favor, informe o valor mínimo.")
+    if (!valorMinimo || parseFloat(valorMinimo) <= 0) {
+      alert("Por favor, informe um valor mínimo válido.")
       return
     }
 
     setLoading(true)
+    console.log("[Consultas] Buscando depósitos acima de:", valorMinimo)
+
     try {
-      const response = await fetch(`http://localhost:8080/api/contas/depositos-acima-de/${valorMinimo}`)
+      const url = `http://localhost:8080/api/contas/depositos-acima-de/${valorMinimo}`
+      console.log("[Consultas] URL:", url)
+
+      const response = await fetch(url)
+      console.log("[Consultas] Status da resposta:", response.status)
+
       if (response.ok) {
         const data = await response.json()
-        setResultados(data)
+        console.log("[Consultas] Dados recebidos:", data)
+        console.log("[Consultas] Tipo de dados:", Array.isArray(data) ? "Array" : typeof data)
+        console.log("[Consultas] Quantidade de registros:", Array.isArray(data) ? data.length : "N/A")
+
+        setResultados(Array.isArray(data) ? data : [])
         setActiveConsulta("depositos-altos")
+
+        if (!Array.isArray(data) || data.length === 0) {
+          alert(`Nenhuma conta encontrada com depósitos acima de R$ ${valorMinimo}`)
+        }
       } else {
-        alert("Erro ao buscar depósitos.")
+        const errorText = await response.text()
+        console.error("[Consultas] Erro do servidor:", errorText)
+        alert(`Erro ao buscar depósitos: ${response.status} - ${errorText}`)
       }
     } catch (error) {
-      alert("Erro de conexão.")
+      console.error("[Consultas] Erro de conexão:", error)
+      alert("Erro de conexão. Verifique se o backend está rodando em http://localhost:8080")
     } finally {
       setLoading(false)
     }
   }
 
   const formatCurrency = (value: number) => {
+    if (value === null || value === undefined) return "—"
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
@@ -71,7 +111,12 @@ export function ConsultasPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("pt-BR")
+    if (!dateString) return "—"
+    try {
+      return new Date(dateString).toLocaleString("pt-BR")
+    } catch {
+      return dateString
+    }
   }
 
   return (
@@ -89,13 +134,13 @@ export function ConsultasPage() {
               Relatório de Auditoria
             </CardTitle>
             <CardDescription>
-              Visualize todas as transações (depósitos e saques) com informações completas das contas (FULL OUTER JOIN)
+              Visualize todas as transações com informações completas das contas (LEFT JOIN)
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={executarAuditoria} disabled={loading} className="w-full gap-2">
               <Search className="w-4 h-4" />
-              Executar Auditoria
+              {loading && activeConsulta === null ? "Executando..." : "Executar Auditoria"}
             </Button>
           </CardContent>
         </Card>
@@ -117,14 +162,15 @@ export function ConsultasPage() {
                 id="valorMinimo"
                 type="number"
                 step="0.01"
+                min="0.01"
                 value={valorMinimo}
                 onChange={(e) => setValorMinimo(e.target.value)}
                 placeholder="Ex: 1000.00"
               />
             </div>
-            <Button onClick={buscarDepositosAltos} disabled={loading} className="w-full gap-2">
+            <Button onClick={buscarDepositosAltos} disabled={loading || !valorMinimo} className="w-full gap-2">
               <Search className="w-4 h-4" />
-              Buscar Depósitos
+              {loading && activeConsulta === "depositos-altos" ? "Buscando..." : "Buscar Depósitos"}
             </Button>
           </CardContent>
         </Card>
@@ -155,12 +201,11 @@ export function ConsultasPage() {
                   <tr className="bg-muted/50 border-b">
                     {activeConsulta === "auditoria" && (
                       <>
-                        <th className="p-4 text-left text-sm font-semibold">Número Conta</th>
+                        <th className="p-4 text-left text-sm font-semibold">ID Conta</th>
                         <th className="p-4 text-left text-sm font-semibold">Agência</th>
-                        <th className="p-4 text-left text-sm font-semibold">Saldo</th>
-                        <th className="p-4 text-left text-sm font-semibold">Valor Transação</th>
-                        <th className="p-4 text-left text-sm font-semibold">Data</th>
-                        <th className="p-4 text-left text-sm font-semibold">Tipo</th>
+                        <th className="p-4 text-left text-sm font-semibold">Número Conta</th>
+                        <th className="p-4 text-left text-sm font-semibold">ID Transação</th>
+                        <th className="p-4 text-left text-sm font-semibold">Data/Hora</th>
                       </>
                     )}
                     {activeConsulta === "depositos-altos" && (
@@ -175,43 +220,41 @@ export function ConsultasPage() {
                 </thead>
                 <tbody>
                   {activeConsulta === "auditoria" &&
-                    resultados.map((item: AuditoriaDTO, index) => (
+                    resultados.map((item: AuditoriaContaTransacaoDTO, index) => (
                       <tr
-                        key={index}
+                        key={`${item.idConta}-${item.idTransacao}-${index}`}
                         className={`border-b hover:bg-muted/30 transition-colors ${
                           index % 2 === 0 ? "bg-background" : "bg-muted/10"
                         }`}
                       >
-                        <td className="p-4">{item.numeroConta || "—"}</td>
-                        <td className="p-4">{item.agencia || "—"}</td>
-                        <td className="p-4">{item.saldoConta ? formatCurrency(item.saldoConta) : "—"}</td>
-                        <td className="p-4">{item.valorTransacao ? formatCurrency(item.valorTransacao) : "—"}</td>
-                        <td className="p-4 text-sm">{item.dataTransacao ? formatDate(item.dataTransacao) : "—"}</td>
                         <td className="p-4">
-                          {item.tipoTransacao && (
-                            <span
-                              className={`px-2 py-1 rounded-md text-xs font-medium ${
-                                item.tipoTransacao === "Depósito"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {item.tipoTransacao}
-                            </span>
-                          )}
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-sm font-medium">
+                            {item.idConta || "—"}
+                          </span>
                         </td>
+                        <td className="p-4">{item.agencia || "—"}</td>
+                        <td className="p-4 font-mono text-sm">{item.numeroConta || "—"}</td>
+                        <td className="p-4">
+                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md text-sm font-medium">
+                            {item.idTransacao || "—"}
+                          </span>
+                        </td>
+                        <td className="p-4 text-sm">{formatDate(item.dataHoraTransacao)}</td>
                       </tr>
                     ))}
-
                   {activeConsulta === "depositos-altos" &&
-                    resultados.map((conta: any, index) => (
+                    resultados.map((conta: ContaDepositoAlto, index) => (
                       <tr
                         key={conta.idConta}
                         className={`border-b hover:bg-muted/30 transition-colors ${
                           index % 2 === 0 ? "bg-background" : "bg-muted/10"
                         }`}
                       >
-                        <td className="p-4">{conta.idConta}</td>
+                        <td className="p-4">
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-sm font-medium">
+                            {conta.idConta}
+                          </span>
+                        </td>
                         <td className="p-4">{conta.agencia}</td>
                         <td className="p-4 font-mono text-sm">{conta.numero}</td>
                         <td className="p-4 font-semibold text-green-600">{formatCurrency(conta.saldo)}</td>
@@ -231,7 +274,11 @@ export function ConsultasPage() {
               <Search className="w-8 h-8 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Nenhum resultado encontrado</h3>
-            <p className="text-muted-foreground">Tente ajustar os parâmetros da consulta</p>
+            <p className="text-muted-foreground">
+              {activeConsulta === "auditoria"
+                ? "Não há transações registradas no sistema"
+                : "Não há contas com depósitos acima do valor informado"}
+            </p>
           </CardContent>
         </Card>
       )}
