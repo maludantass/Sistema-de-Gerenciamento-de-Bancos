@@ -103,9 +103,9 @@ public class ContaController {
      * Busca contas que tiveram depósitos acima de um valor mínimo.
      * GET /api/contas/depositos-acima?valor=500.00
      */
-    @GetMapping("/depositos-acima")
+    @GetMapping("/depositos-acima/{valor}")
     public List<Conta> getContasComDepositosAcimaDe(
-            @RequestParam("valor") BigDecimal valorMinimo) {
+            @PathVariable("valor") BigDecimal valorMinimo) {
         return contaService.encontrarContasComDepositosAcimaDe(valorMinimo);
     }
 

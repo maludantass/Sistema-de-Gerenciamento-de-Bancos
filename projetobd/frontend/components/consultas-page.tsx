@@ -71,7 +71,7 @@ export function ConsultasPage() {
     console.log("[Consultas] Buscando depósitos acima de:", valorMinimo)
 
     try {
-      const url = `http://localhost:8080/api/contas/depositos-acima-de/${valorMinimo}`
+      const url = `http://localhost:8080/api/contas/depositos-acima/${valorMinimo}`
       console.log("[Consultas] URL:", url)
 
       const response = await fetch(url)

@@ -189,11 +189,20 @@ public class ContaRepository {
         // combinando onde a condição (ON) é verdadeira.
         String sql = """
             SELECT 
-                C.idConta, C.agencia, C.numero,
-                T.idTransacao, T.dataHora
-            FROM Conta C
-            FULL OUTER JOIN Transacao T ON C.idConta = T.idConta
-            ORDER BY C.idConta, T.dataHora
+    C.idConta, C.agencia, C.numero,
+    T.idTransacao, T.dataHora
+FROM Conta C
+LEFT JOIN Transacao T ON C.idConta = T.idConta
+
+UNION
+
+SELECT 
+    C.idConta, C.agencia, C.numero,
+    T.idTransacao, T.dataHora
+FROM Conta C
+RIGHT JOIN Transacao T ON C.idConta = T.idConta
+
+ORDER BY idConta, dataHora;
             """;
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
