@@ -134,7 +134,7 @@ export function ConsultasPage() {
               Relatório de Auditoria
             </CardTitle>
             <CardDescription>
-              Visualize todas as transações com informações completas das contas (LEFT JOIN)
+              Visualize todas as transações com informações completas das contas 
             </CardDescription>
           </CardHeader>
           <CardContent>
