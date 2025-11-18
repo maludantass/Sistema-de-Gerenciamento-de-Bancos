@@ -604,7 +604,8 @@ export function ContasPage() {
                 {activeFilter === "busca-individual" && contaEncontrada && (
                   <tr className="border-b border-border hover:bg-muted/30 transition-colors bg-background">
                     <td className="p-4">
-                      <span className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm font-medium">
+                      <span
+                      className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm font-medium">
                         {contaEncontrada.idConta}
                       </span>
                     </td>
@@ -650,7 +651,9 @@ export function ContasPage() {
                       }`}
                     >
                       <td className="p-4">
-                        <span className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm font-medium">
+                        <span 
+                        style={{ color: '#000000' }}
+                        className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm font-medium">
                           {conta.idConta}
                         </span>
                       </td>

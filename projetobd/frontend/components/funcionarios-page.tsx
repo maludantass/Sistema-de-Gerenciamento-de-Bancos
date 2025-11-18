@@ -528,7 +528,9 @@ export function FuncionariosPage() {
                       </td>
                       <td className="p-4 font-medium text-foreground">{funcionario.nome}</td>
                       <td className="p-4">
-                        <span className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
+                        <span 
+                        style={{ color: '#000000' }}
+                        className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
                           {funcionario.funcao}
                         </span>
                       </td>
@@ -572,7 +574,9 @@ export function FuncionariosPage() {
                       </td>
                       <td className="p-4 font-medium text-foreground">{funcionario.nomeFuncionario}</td>
                       <td className="p-4">
-                        <span className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
+                        <span 
+                        style={{ color: '#000000' }}
+                        className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
                           {funcionario.funcao}
                         </span>
                       </td>
@@ -606,7 +610,9 @@ export function FuncionariosPage() {
                       </td>
                       <td className="p-4 font-medium text-foreground">{funcionario.nome}</td>
                       <td className="p-4">
-                        <span className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
+                        <span 
+                        style={{ color: '#000000' }}
+                        className="bg-accent/10 text-accent-foreground px-2 py-1 rounded-md text-sm">
                           {funcionario.funcao}
                         </span>
                       </td>
