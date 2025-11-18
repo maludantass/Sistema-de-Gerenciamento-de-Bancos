@@ -13,6 +13,7 @@ interface Deposito {
   valorDeposito: number
   dataHora: string
   idConta: number
+  origemValor: string
   metodoDeposito: string
 }
 
