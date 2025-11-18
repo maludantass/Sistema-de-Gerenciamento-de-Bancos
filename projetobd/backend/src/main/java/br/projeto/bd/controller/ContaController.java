@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,8 @@ public class ContaController {
 
     @Autowired
     private ContaService contaService;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     // ... (Métodos CRUD e os dois métodos novos que você já tinha)
 
     // CREATE -> POST /api/contas
@@ -117,5 +119,23 @@ public class ContaController {
     @GetMapping("/relatorio-auditoria")
     public List<AuditoriaContaTransacaoDTO> getRelatorioAuditoria() {
         return contaService.gerarRelatorioAuditoriaContasTransacoes();
+    }
+    
+    // O método que você adicionou
+    @GetMapping("/view/posicao-financeira")
+    public List<PosicaoFinanceiraDTO> getPosicaoFinanceira() {
+        String sql = "SELECT * FROM vw_PosicaoFinanceiraServicos";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            PosicaoFinanceiraDTO dto = new PosicaoFinanceiraDTO();
+            dto.setId_Cliente(rs.getInt("id_Cliente"));
+            dto.setNome_cliente(rs.getString("nome_cliente"));
+            dto.setIdConta(rs.getInt("idConta"));
+            dto.setSaldo(rs.getBigDecimal("saldo"));
+            dto.setIdServico(rs.getInt("idServico"));
+            dto.setDescricao_servico(rs.getString("descricao_servico"));
+            dto.setIdContrato(rs.getInt("idContrato"));
+            dto.setValor_contrato(rs.getBigDecimal("valor_contrato"));
+            return dto;
+        });
     }
 }
